@@ -1,0 +1,183 @@
+"""Build ne-campaign-finance/index.html -- the dataset's landing page.
+
+Not a search interface. Cross-source search lives in ../ne-connect/; this page
+answers the question a reporter arrives with when they follow a "source project"
+link from there: what is this dataset, how complete is it, what will bite me,
+and where is the state's own copy.
+
+Numbers come from data/processed/summary.json, which normalize.py writes, so the
+page cannot claim totals nobody computed. If the data has not been built, the
+page is not built either.
+"""
+
+from __future__ import annotations
+
+import json
+from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SUMMARY = ROOT / "data" / "processed" / "summary.json"
+META = ROOT / "data" / "scrape_meta.json"
+OUT = ROOT / "index.html"
+
+STYLE = """
+  :root {
+    --bg:#fff; --panel:#f6f7f9; --border:#d9dde3; --text:#14181d; --muted:#626b76;
+    --accent:#d00000; --accent-soft:#fdecec; --shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#14171a; --panel:#1c2025; --border:#2c323a; --text:#e6e9ed;
+      --muted:#949dab; --accent:#ff6b6b; --accent-soft:#2a1c1d;
+      --shadow:0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:82ch;margin:0 auto;padding:26px 20px 60px}
+  h1{margin:0 0 6px;font-size:22px;letter-spacing:-.01em}
+  h2{margin:30px 0 10px;font-size:15px;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--muted)}
+  p{margin:0 0 12px}
+  .lede{color:var(--muted)}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:4px;
+    padding:8px 12px;min-width:132px;box-shadow:var(--shadow)}
+  .stat b{display:block;font-size:18px;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums}
+  .stat span{color:var(--muted);font-size:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 16px}
+  th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;
+    letter-spacing:.04em}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .warn{background:var(--accent-soft);border-left:3px solid var(--accent);
+    border-radius:3px;padding:10px 12px;margin:14px 0}
+  .warn strong{color:var(--accent)}
+  ul{margin:0 0 12px;padding-left:20px}
+  li{margin-bottom:7px}
+  a{color:var(--accent)}
+  footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--border);
+    color:var(--muted);font-size:13px}
+"""
+
+
+def main() -> int:
+    if not SUMMARY.exists():
+        print("no data/processed/summary.json -- run scripts/normalize.py first")
+        return 1
+    s = json.loads(SUMMARY.read_text())
+    counts = s["row_counts"]
+    years = s["years"]
+
+    retrieved = ""
+    if META.exists():
+        runs = json.loads(META.read_text())
+        stamps = [r["run_date"] for y in runs.values() for rs in y.values() for r in rs]
+        retrieved = max(stamps) if stamps else ""
+
+    rows = "".join(
+        f"<tr><td>{label}</td><td class='n'>{counts[key]:,}</td><td>{note}</td></tr>"
+        for key, label, note in (
+            ("contributions", "Contributions", "money and value received"),
+            ("loans", "Loans", "borrowed, not given"),
+            ("other_receipts", "Other receipts", "interest, refunds, adjustments, pledges"),
+            ("expenditures", "Expenditures", "every row of the spending extract"),
+            (
+                "independent_expenditures",
+                "Independent expenditures",
+                "<strong>a subset of expenditures, not extra rows</strong>",
+            ),
+        )
+    )
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nebraska Campaign Finance</title>
+<meta name="description" content="Nebraska campaign contributions and expenditures {years[0]}-{years[-1]}, collected from the NADC FirstTuesday bulk extracts.">
+<style>{STYLE}</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Nebraska Campaign Finance</h1>
+  <p class="lede">Contributions, loans and spending reported to the
+  <a href="https://nadc.nebraska.gov/campaign-finance-general-information">Nebraska
+  Accountability and Disclosure Commission</a>, {years[0]}&ndash;{years[-1]},
+  collected from the FirstTuesday bulk extracts and normalized into five tables.
+  Cross-source search is in the <a href="../ne-connect/">Public Records Hub</a>.</p>
+
+  <div class="stats">
+    <div class="stat"><b>{sum(counts.values()):,}</b><span>rows collected</span></div>
+    <div class="stat"><b>${s['contribution_total'] / 1e6:,.1f}M</b><span>contributions</span></div>
+    <div class="stat"><b>${s['expenditure_total'] / 1e6:,.1f}M</b><span>expenditures</span></div>
+    <div class="stat"><b>${s['independent_expenditure_total'] / 1e6:,.1f}M</b><span>independent spending</span></div>
+    <div class="stat"><b>{years[0]}&ndash;{years[-1]}</b><span>years covered</span></div>
+  </div>
+
+  <h2>The tables</h2>
+  <table>
+    <tr><th>Table</th><th class="n">Rows</th><th>What it holds</th></tr>
+    {rows}
+  </table>
+
+  <h2>Read this before quoting it</h2>
+  <div class="warn">
+    <strong>Summing the amount column over-counts.</strong> The state fans one
+    transaction out over several rows that share an ID &mdash; an independent
+    expenditure against five candidates is five rows, a contribution to a slate
+    committee is one row per candidate &mdash; repeating the amount on each. Every
+    row carries an <code>include_in_total</code> flag; sum where it is true. For
+    2022 contributions alone that is the difference between $68,865,363 and
+    $68,955,221.
+  </div>
+  <ul>
+    <li><strong>Only itemized transactions appear.</strong> Contributions below the
+    roughly $250 aggregate threshold are reported as lump sums on a committee's
+    summary page, never as line items. Totals built from line items undercount
+    small money.</li>
+    <li><strong>Amendments overwrite; there is no history.</strong> The amended
+    column is a bare Y/N flag. A corrected filing replaces the original in place,
+    so two pulls on different dates can disagree with no audit trail. Every dated
+    pull is archived here because the state keeps no such record.</li>
+    <li><strong>Each extract is a snapshot, not a ledger.</strong> Late and
+    corrected transactions appear retroactively in prior years. No year is ever
+    final.</li>
+    <li><strong>A loan is not a contribution,</strong> and a bare pledge is not
+    money &mdash; both are kept out of the contributions table on purpose. A
+    $50,000 self-loan is borrowed, not raised.</li>
+    <li><strong>{years[0]}&ndash;{years[-1]} only.</strong> This is the
+    FirstTuesday era. Filings from 1985&ndash;2021 sit in a separate, frozen state
+    dataset that is not collected here yet.</li>
+    <li><strong>Federal candidates file with the FEC,</strong> not the NADC.</li>
+  </ul>
+
+  <h2>Provenance</h2>
+  <p>Downloaded from the NADC's
+  <a href="https://nadc-e.nebraska.gov/PublicSite/DataDownload.aspx">bulk data
+  page</a>{f", most recently {retrieved}" if retrieved else ""}. The state
+  publishes column layouts, but the expenditures layout misnames three of its own
+  columns and the transaction-type lists in both PDFs do not match the data, so
+  the scraper checks every header against a confirmed layout and fails loudly
+  rather than guessing.</p>
+
+  <footer>
+    Built {date.today().isoformat()}. Method, caveats and open work are in the
+    <a href="https://github.com/diepjustin/diepjustin.github.io/tree/main/ne-campaign-finance">project README</a>.
+    No analytics, no tracking, nothing loads from a third party.
+  </footer>
+</div>
+</body>
+</html>
+"""
+    OUT.write_text(html, encoding="utf-8")
+    print(f"  rows {sum(counts.values()):,}  ->  {OUT.name} ({len(html) / 1024:.0f} KB)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
