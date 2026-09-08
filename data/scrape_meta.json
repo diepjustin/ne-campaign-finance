@@ -1,0 +1,96 @@
+{
+  "contributions": {
+    "2022": [
+      {
+        "column_count": 24,
+        "path": "raw/contributions/2022/2026-09-08.csv",
+        "row_count": 35507,
+        "run_date": "2026-09-08",
+        "sha256": "97004a33a664c618fe986c6ffcf01019bf267856fe56e153c6b61d7d95a31677"
+      }
+    ],
+    "2023": [
+      {
+        "column_count": 24,
+        "path": "raw/contributions/2023/2026-09-08.csv",
+        "row_count": 9486,
+        "run_date": "2026-09-08",
+        "sha256": "dfd2bc4b0a4e2ed0a862290d7deaf83ade2221208c02602266875088b0281424"
+      }
+    ],
+    "2024": [
+      {
+        "column_count": 24,
+        "path": "raw/contributions/2024/2026-09-08.csv",
+        "row_count": 34680,
+        "run_date": "2026-09-08",
+        "sha256": "586c17b3a7ed46c61409969caa6146f7f1b536ce753d06db83cb96dddb52b135"
+      }
+    ],
+    "2025": [
+      {
+        "column_count": 24,
+        "path": "raw/contributions/2025/2026-09-08.csv",
+        "row_count": 12241,
+        "run_date": "2026-09-08",
+        "sha256": "c3738799757f8de2684f0217a74829ac851b7311e10bc35f287099983cbb9383"
+      }
+    ],
+    "2026": [
+      {
+        "column_count": 24,
+        "path": "raw/contributions/2026/2026-09-08.csv",
+        "row_count": 28397,
+        "run_date": "2026-09-08",
+        "sha256": "1cb0334ad5477a16657dc24278596e9d4040d697cbe3bea58b50a510ee78e2c3"
+      }
+    ]
+  },
+  "expenditures": {
+    "2022": [
+      {
+        "column_count": 28,
+        "path": "raw/expenditures/2022/2026-09-08.csv",
+        "row_count": 22760,
+        "run_date": "2026-09-08",
+        "sha256": "c77ab5996f9f18648a4a7a31d8d433efdd24032f025972389c06e803ea63e5f4"
+      }
+    ],
+    "2023": [
+      {
+        "column_count": 28,
+        "path": "raw/expenditures/2023/2026-09-08.csv",
+        "row_count": 9232,
+        "run_date": "2026-09-08",
+        "sha256": "ff200acb8bdc8f74fd2a8ed085e9ec016917a1fe161272eb645e86545a092d0d"
+      }
+    ],
+    "2024": [
+      {
+        "column_count": 28,
+        "path": "raw/expenditures/2024/2026-09-08.csv",
+        "row_count": 24626,
+        "run_date": "2026-09-08",
+        "sha256": "d8ffa3a3e64e83b96a44b2878c17ecc5232caa2142de20ee503a0399ba5c8968"
+      }
+    ],
+    "2025": [
+      {
+        "column_count": 28,
+        "path": "raw/expenditures/2025/2026-09-08.csv",
+        "row_count": 12589,
+        "run_date": "2026-09-08",
+        "sha256": "caa1838ac639a5f3565f4e6f6a05727e510410fb9dc6ce9846802f72a9524b34"
+      }
+    ],
+    "2026": [
+      {
+        "column_count": 28,
+        "path": "raw/expenditures/2026/2026-09-08.csv",
+        "row_count": 17741,
+        "run_date": "2026-09-08",
+        "sha256": "19c1e0502c101f0cd68c2782931d985933ce5f5ecc79556c9181b84d4c6768d1"
+      }
+    ]
+  }
+}

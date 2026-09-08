@@ -1,0 +1,8 @@
+Receipt ID,Org ID,Filer Type,Filer Name,Candidate Name,Receipt Transaction/Contribution Type,Other Funds Type,Receipt Date,Receipt Amount,Description,Contributor or Transaction Source Type,Contributor or Source Name (Individual Last Name),First Name,Middle Name,Suffix,Address 1,Address 2,City,State,Zip,Filed Date,Amended,Employer,Occupation
+100001,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Monetary,,01/15/2026,250.00,,Individual,Doe,Jane,,,123 Fake St,,Lincoln,NE,68508,01/20/2026,N,Acme Corp,Engineer
+100002,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Monetary,,02/01/2026,"1,000.00",,Committee,Test PAC,,,,456 Elm Ave,Suite 2,Omaha,NE,68102,02/05/2026,N,,
+100003,5002,PAC,Nebraska Test PAC,,In-Kind Contribution,,02/10/2026,75.50,Printed yard signs,Individual,Smith,John,Q,Jr,789 Oak Dr,,Grand Island,NE,68801,02/15/2026,Y,Self,Farmer
+100004,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Loan,,03/01/2026,"5,000.00",Candidate self-loan,Self (Candidate),Candidate,Test,,,123 Fake St,,Lincoln,NE,68508,03/05/2026,N,,
+100005,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Other Funds Received (Miscellaneous Receipts),Interest Income from Campaign Checking Account,03/31/2026,12.34,,,,,,,,,,,,04/02/2026,N,,
+100006,5002,PAC,Nebraska Test PAC,,Pledge,,04/01/2026,500.00,Promised but not yet paid,Individual,Roe,Rick,,,321 Pine Rd,,Kearney,NE,68845,04/05/2026,N,,
+100007,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Brand New Receipt Type,,05/01/2026,99.00,Unclassified,Individual,Doe,Jane,,,123 Fake St,,Lincoln,NE,68508,05/05/2026,N,,

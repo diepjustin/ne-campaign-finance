@@ -1,0 +1,4 @@
+Receipt ID,Org ID,Filer Type,Filer Name,Candidate Name,Receipt Transaction/Contribution Type,Receipt Date,Receipt Amount,Contributor or Transaction Source Type,Contributor or Source Name,First Name,Address 1,City,State,Zip,Filed Date,Amended,Employer,Occupation,Description
+200001,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Monetary,01/15/2026,not-a-number,Individual,Doe,Jane,123 Fake St,Lincoln,NE,68508,01/20/2026,N,Acme Corp,Engineer,
+200001,5001,Candidate Committee,Friends of Test Candidate,Test Candidate,Monetary,01/15/2026,250.00,Individual,Doe,Jane,123 Fake St,Lincoln,NE,68508,01/20/2026,N,Acme Corp,Engineer,
+200002,5001,Candidate Committee,,,Monetary,not-a-date,100.00,Individual,Roe,Rick,321 Pine Rd,Kearney,NE,68845,,N,,,
