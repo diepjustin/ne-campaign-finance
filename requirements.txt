@@ -1,4 +1,4 @@
-requests==2.31.0
+requests==2.32.5
 
 # Test suite (tests/). No network, no data/ -- meant to run before any download
 # so a broken parser or a schema drift is caught before we trust what we fetched.
