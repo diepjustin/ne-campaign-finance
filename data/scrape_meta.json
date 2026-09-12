@@ -92,5 +92,28 @@
         "sha256": "19c1e0502c101f0cd68c2782931d985933ce5f5ecc79556c9181b84d4c6768d1"
       }
     ]
+  },
+  "legacy": {
+    "members": {
+      "DATE_UPDATED.TXT": 37,
+      "formb1ab.txt": 20084283,
+      "formb1d.txt": 13217895,
+      "formb2a.txt": 1069181,
+      "formb2b.txt": 733888,
+      "formb4a.txt": 3706994,
+      "formb4b1.txt": 4320577,
+      "formb5.txt": 754780,
+      "formb72.txt": 4597608,
+      "formb73.txt": 1186627,
+      "formc1.txt": 15652158,
+      "formc1inc.txt": 1181402,
+      "formc1prop.txt": 203,
+      "formc2.txt": 870028,
+      "nadc_tables.rtf": 315630
+    },
+    "path": "raw/legacy/2026-09-12",
+    "retrieved_at": "2026-09-12",
+    "sha256": "d08d5422334e42d93e2bf440eb65530c2b19552077164b76c49a3e6b32dee225",
+    "source_url": "https://nebraska.gov/nadc_data/nadc_data.zip"
   }
 }

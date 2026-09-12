@@ -1,0 +1,3 @@
+Committee Name|Committee ID|Date Received|Type of Contributor|Contributor ID|Contribution Date|Cash Contribution|In-Kind Contribution|Unpaid Pledges|Contributor Last Name|Contributor First Name|Contributor Middle Initial|Contributor Organization Name|Contributor Address|Contributor City|Contributor State|Contributor Zipcode
+FRIENDS OF TEST|10CON00001|01/02/2015|Individual|99IND00001|01/01/2015|100||0|SAMPLE|JANE|Q||123 MAIN ST|LINCOLN|NE|68508
+FRIENDS OF TEST|10CON00001|01/02/2015|Individual|99IND00001|01/01/2015|100||0|SAMPLE|JANE|Q||123 MAIN ST|LINCOLN|NE|68508
