@@ -1,0 +1,116 @@
+name: NE Campaign Finance daily download
+
+on:
+  schedule:
+    # Both fire every day; the gate step below lets through only the entry
+    # matching the current UTC offset, so exactly one does anything on any
+    # given day. Two entries exist because GitHub Actions cron is UTC-only
+    # with no DST awareness -- see ne-contracts' daily.yml for the incident
+    # that made gating on the fired cron entry (not the wall clock) the rule.
+    - cron: '0 9 * * *'   # 4am Central during CDT (UTC-5, 09:00 UTC)
+    - cron: '0 10 * * *'  # 4am Central during CST (UTC-6, 10:00 UTC)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: write   # for `gh cache delete` cleanup
+
+concurrency:
+  group: ne-campaign-finance-daily
+  cancel-in-progress: false   # never cancel a run that might be mid-write to data/
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Pick the DST-correct cron entry
+        id: gate
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          offset=$(TZ=America/Chicago date +%z)
+          case "$offset" in
+            -0500) want='0 9 * * *' ;;   # CDT
+            -0600) want='0 10 * * *' ;;  # CST
+            *)     want='' ;;
+          esac
+
+          if [ "${{ github.event_name }}" = 'workflow_dispatch' ]; then
+            proceed=true
+          elif [ -n "$want" ] && [ "$SCHEDULE" = "$want" ]; then
+            proceed=true
+          else
+            proceed=false
+            echo "Central offset is $offset, so today's real run is cron '$want'; this run came from '$SCHEDULE'. Skipping."
+          fi
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+          echo "Central offset $offset -> proceed=$proceed"
+
+      - uses: actions/setup-python@v6
+        if: steps.gate.outputs.proceed == 'true'
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        if: steps.gate.outputs.proceed == 'true'
+        run: pip install -r requirements.txt
+
+      # Pure-function tests over the parsers and schemas, no network and no
+      # data/ -- a broken parser should stop the run before it fetches anything.
+      - name: Tests
+        if: steps.gate.outputs.proceed == 'true'
+        run: python3 -m pytest tests/ -q
+
+      # Unlike ne-contracts (an hours-long scrape whose baseline is worth
+      # protecting with fail-on-cache-miss), a full download_extracts.py run
+      # here is minutes -- so a cache miss just redownloads instead of
+      # failing the job. Restoring on a hit still saves most runs from
+      # re-fetching data the state hasn't changed (download_extracts.py
+      # skips a year already pulled today).
+      - name: Restore data/ cache
+        if: steps.gate.outputs.proceed == 'true'
+        uses: actions/cache/restore@v5
+        with:
+          path: data
+          key: ne-campaign-finance-data-${{ github.run_id }}
+          restore-keys: |
+            ne-campaign-finance-data-
+
+      - name: Download extracts (validates and guards against a shrink)
+        if: steps.gate.outputs.proceed == 'true'
+        run: python3 scripts/download_extracts.py
+
+      - name: Normalize
+        if: steps.gate.outputs.proceed == 'true'
+        run: python3 scripts/normalize.py
+
+      - name: Check data/ is worth caching
+        id: cachecheck
+        if: always() && steps.gate.outputs.proceed == 'true'
+        run: |
+          if ls data/processed/*.csv >/dev/null 2>&1; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            du -sh data
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::data/processed holds no CSVs -- skipping the cache save so the existing good cache stays the newest match."
+          fi
+
+      - name: Save data/ cache
+        if: always() && steps.cachecheck.outputs.ok == 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: data
+          key: ne-campaign-finance-data-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Delete old data/ cache entries (keep newest 3)
+        if: always() && steps.cachecheck.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh cache list --key ne-campaign-finance-data- --json id,createdAt --limit 100 \
+            | jq -r 'sort_by(.createdAt) | reverse | .[3:] | .[].id' \
+            | xargs -r -n1 gh cache delete
