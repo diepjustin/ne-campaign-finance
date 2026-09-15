@@ -87,6 +87,27 @@ jobs:
         if: steps.gate.outputs.proceed == 'true'
         run: python3 scripts/normalize.py
 
+      # The legacy zip is frozen by the state (see download_legacy.py's own
+      # sha256 check) -- this step is cheap every night: one GET, a sha
+      # compare, and extraction only runs again if that sha ever changes.
+      - name: Download legacy (sha-checked, skips extraction if unchanged)
+        if: steps.gate.outputs.proceed == 'true'
+        run: python3 scripts/download_legacy.py
+
+      - name: Normalize legacy
+        if: steps.gate.outputs.proceed == 'true'
+        run: python3 scripts/normalize_legacy.py
+
+      - name: Build the search page
+        if: steps.gate.outputs.proceed == 'true'
+        run: python3 scripts/build_site.py
+
+      # scrape_c1.py is deliberately NOT run here yet. It has no --new-only /
+      # incremental mode -- every run today re-sweeps the search grid from
+      # scratch, and a live financial-disclosure site is not something to
+      # put on an unbounded nightly cron without that dedup logic designed
+      # and the cadence decided first. See PLAN.md 1.6.
+
       - name: Check data/ is worth caching
         id: cachecheck
         if: always() && steps.gate.outputs.proceed == 'true'
