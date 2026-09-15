@@ -92,3 +92,54 @@ def test_filer_totals_key_by_org_id_and_sum_receipts(tmp_path, monkeypatch):
     contributors, filers, rows_by_contributor = build_site.build_search_index()
 
     assert filers == [["Example PAC", "100", 125.0, 2]]
+
+
+def test_modern_rows_are_tagged_era_modern(tmp_path, monkeypatch):
+    row = (
+        "1,100,PAC,Example PAC,,Monetary,,2025-01-01,50.0,,Individual,DOE,"
+        "JANE,,,1 ST,,LINCOLN,NE,68508,2025-02-01,N,,,JANE DOE,1,True,2025,"
+        "s.csv\n"
+    )
+    monkeypatch.setattr(build_site, "CONTRIBUTIONS", _write_contributions(tmp_path, [row]))
+
+    _, _, rows_by_contributor = build_site.build_search_index()
+
+    assert rows_by_contributor["JANE DOE"][0][-1] == "modern"
+
+
+def test_legacy_rows_join_the_same_detail_list_tagged_pre2022(tmp_path, monkeypatch):
+    """The whole point of ne-connect's ask: one name's transaction list spans
+    both eras, even though their dollar totals are never summed (see
+    LEGACY_CONTRIBUTIONS's own comment)."""
+    modern_row = (
+        "1,100,PAC,Example PAC,,Monetary,,2025-01-01,50.0,,Individual,DOE,"
+        "JANE,,,1 ST,,LINCOLN,NE,68508,2025-02-01,N,,,JANE DOE,1,True,2025,"
+        "s.csv\n"
+    )
+    legacy_header = (
+        "receipt_id,org_id,filer_type,filer_name,candidate_name,transaction_type,"
+        "other_funds_type,receipt_date,amount,description,source_type,"
+        "source_last_name,source_first_name,source_middle_name,source_suffix,"
+        "address_1,address_2,city,state,zip,filed_date,amended,employer,"
+        "occupation,source_name,rows_sharing_id,include_in_total,source_year,"
+        "source_snapshot,era,source_form\n"
+    )
+    legacy_row = (
+        "9,200,PAC,Old Committee,,Monetary,,2018-05-01,25.0,,Individual,DOE,"
+        "JANE,,,9 ST,,LINCOLN,NE,68508,2018-06-01,N,,,JANE DOE,9,True,2018,"
+        "s.csv,pre2022,formb1ab\n"
+    )
+    monkeypatch.setattr(build_site, "CONTRIBUTIONS", _write_contributions(tmp_path, [modern_row]))
+    legacy_path = tmp_path / "contributions_legacy.csv"
+    legacy_path.write_text(legacy_header + legacy_row, encoding="utf-8")
+    monkeypatch.setattr(build_site, "LEGACY_CONTRIBUTIONS", legacy_path)
+
+    contributors, filers, rows_by_contributor = build_site.build_search_index()
+
+    txns = rows_by_contributor["JANE DOE"]
+    assert len(txns) == 2
+    eras = {t[-1] for t in txns}
+    assert eras == {"modern", "pre2022"}
+    # The legacy row must never inflate the modern-only aggregate total.
+    by_name = {c[0]: c for c in contributors}
+    assert by_name["JANE DOE"][1] == 50.0

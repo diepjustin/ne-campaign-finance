@@ -39,6 +39,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SUMMARY = ROOT / "data" / "processed" / "summary.json"
 CONTRIBUTIONS = ROOT / "data" / "processed" / "contributions.csv"
+# Pre-2022 rows join the same per-contributor detail list (below) but never
+# the modern-only aggregate totals above it -- PLAN.md 1.4's "the two eras
+# are never summed into one figure" rule applies here exactly as it does on
+# ne-connect's own page.
+LEGACY_CONTRIBUTIONS = ROOT / "data" / "processed" / "contributions_legacy.csv"
 META = ROOT / "data" / "scrape_meta.json"
 OUT = ROOT / "index.html"
 ROWS_OUT = ROOT / "d" / "rows.json"
@@ -123,6 +128,36 @@ def _money(raw: str) -> float:
         return 0.0
 
 
+def _append_legacy_rows(rows_by_contributor):
+    """Fold contributions_legacy.csv's rows into the same per-contributor
+    detail list, tagged era="pre2022" -- but never into contributor_totals/
+    filer_totals, which stay modern-only (see LEGACY_CONTRIBUTIONS's own
+    comment). ne-connect's entity detail view is the reason this exists: a
+    reporter looking up one name wants every itemized record, not just the
+    2022+ ones, even though the two eras' dollar totals are never summed.
+    """
+    if not LEGACY_CONTRIBUTIONS.exists():
+        return
+    with LEGACY_CONTRIBUTIONS.open(encoding="utf-8", newline="") as fh:
+        for row in csv.DictReader(fh):
+            source_name = (row.get("source_name") or "").strip()
+            if not source_name:
+                continue
+            rows_by_contributor[source_name].append(
+                [
+                    row.get("receipt_date", ""),
+                    round(_money(row.get("amount")), 2),
+                    (row.get("filer_name") or "").strip(),
+                    row.get("org_id", ""),
+                    (row.get("city") or "").strip(),
+                    (row.get("state") or "").strip(),
+                    (row.get("description") or "").strip(),
+                    row.get("include_in_total") == "True",
+                    "pre2022",
+                ]
+            )
+
+
 def build_search_index():
     """One pass over contributions.csv -> two inline indices plus the lazy
     per-contributor transaction payload.
@@ -171,6 +206,7 @@ def build_search_index():
                         (row.get("state") or "").strip(),
                         (row.get("description") or "").strip(),
                         included,
+                        "modern",
                     ]
                 )
 
@@ -180,6 +216,8 @@ def build_search_index():
                 )
                 f["total"] += amount
                 f["count"] += 1
+
+    _append_legacy_rows(rows_by_contributor)
 
     contributors = sorted(
         (
@@ -336,7 +374,11 @@ const FILERS = {filers_json};
 const ORG_DETAIL = {json.dumps(ORG_DETAIL_URL)};
 
 // Lazy: one contributor's transaction rows, fetched only once someone expands
-// that contributor. [date, amount, filer_name, org_id, city, state, description, included]
+// that contributor. [date, amount, filer_name, org_id, city, state,
+// description, included, era] -- era is "modern" (2022+) or "pre2022"
+// (frozen by the state); rows from both eras share one list here since a
+// reporter wants every itemized record for a name, but era is still never
+// summed into one dollar figure (see the modern-only stat card above).
 let ROWS = null;
 function loadRows() {{
   if (ROWS) return Promise.resolve(ROWS);
@@ -357,13 +399,14 @@ function renderContributorDetail(name, kind) {{
       : `<p><b>${{money(txns.filter(t => t[7]).reduce((s, t) => s + t[1], 0))}}</b> across
          ${{txns.filter(t => t[7]).length}} itemized transaction(s).</p>`;
     const rowsHtml = txns.slice(0, 200).map(t => {{
-      const [dateStr, amount, filerName, orgId, city, state, desc, included] = t;
+      const [dateStr, amount, filerName, orgId, city, state, desc, included, era] = t;
       const recipient = orgId
         ? `<a href="${{ORG_DETAIL.replace('{{org_id}}', encodeURIComponent(orgId))}}" target="_blank" rel="noopener">${{esc(filerName)}}</a>`
         : esc(filerName);
       const place = [city, state].filter(Boolean).join(', ');
+      const legacyNote = era === 'pre2022' ? ' <span class="kind">pre-2022</span>' : '';
       return `<tr${{included ? '' : ' style="opacity:.55" title="not counted in the total -- see include_in_total"'}}>
-        <td>${{esc(dateStr)}}</td><td class="n">${{money(amount)}}</td>
+        <td>${{esc(dateStr)}}${{legacyNote}}</td><td class="n">${{money(amount)}}</td>
         <td class="txn-recipient">${{recipient}}</td><td>${{esc(place)}}</td>
         <td>${{esc(desc)}}</td></tr>`;
     }}).join('');

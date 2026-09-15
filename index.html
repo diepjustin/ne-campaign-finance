@@ -136,7 +136,7 @@
   rather than guessing.</p>
 
   <footer>
-    Built 2026-09-14. Method, caveats and open work are in the
+    Built 2026-09-15. Method, caveats and open work are in the
     <a href="https://github.com/diepjustin/diepjustin.github.io/tree/main/ne-campaign-finance">project README</a>.
     No analytics, no tracking, nothing loads from a third party.
   </footer>
@@ -149,7 +149,11 @@ const FILERS = [["JIM PILLEN FOR GOVERNOR","7688",24413787.39,3828],["PROTECT OU
 const ORG_DETAIL = "https://nadc-e.nebraska.gov/PublicSite/SearchPages/OrganizationDetail.aspx?OrganizationID={org_id}";
 
 // Lazy: one contributor's transaction rows, fetched only once someone expands
-// that contributor. [date, amount, filer_name, org_id, city, state, description, included]
+// that contributor. [date, amount, filer_name, org_id, city, state,
+// description, included, era] -- era is "modern" (2022+) or "pre2022"
+// (frozen by the state); rows from both eras share one list here since a
+// reporter wants every itemized record for a name, but era is still never
+// summed into one dollar figure (see the modern-only stat card above).
 let ROWS = null;
 function loadRows() {
   if (ROWS) return Promise.resolve(ROWS);
@@ -170,13 +174,14 @@ function renderContributorDetail(name, kind) {
       : `<p><b>${money(txns.filter(t => t[7]).reduce((s, t) => s + t[1], 0))}</b> across
          ${txns.filter(t => t[7]).length} itemized transaction(s).</p>`;
     const rowsHtml = txns.slice(0, 200).map(t => {
-      const [dateStr, amount, filerName, orgId, city, state, desc, included] = t;
+      const [dateStr, amount, filerName, orgId, city, state, desc, included, era] = t;
       const recipient = orgId
         ? `<a href="${ORG_DETAIL.replace('{org_id}', encodeURIComponent(orgId))}" target="_blank" rel="noopener">${esc(filerName)}</a>`
         : esc(filerName);
       const place = [city, state].filter(Boolean).join(', ');
+      const legacyNote = era === 'pre2022' ? ' <span class="kind">pre-2022</span>' : '';
       return `<tr${included ? '' : ' style="opacity:.55" title="not counted in the total -- see include_in_total"'}>
-        <td>${esc(dateStr)}</td><td class="n">${money(amount)}</td>
+        <td>${esc(dateStr)}${legacyNote}</td><td class="n">${money(amount)}</td>
         <td class="txn-recipient">${recipient}</td><td>${esc(place)}</td>
         <td>${esc(desc)}</td></tr>`;
     }).join('');
