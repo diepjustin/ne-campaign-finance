@@ -72,20 +72,64 @@ def test_download_legacy_first_run_writes_dated_dir_and_meta(tmp_path, monkeypat
     assert meta["legacy"]["source_url"] == dl.LEGACY_URL
 
 
-def test_download_legacy_skips_extraction_when_sha_unchanged(tmp_path, monkeypatch):
+def test_download_legacy_skips_extraction_when_sha_unchanged_and_files_present(
+    tmp_path, monkeypatch
+):
+    """The normal repeat-run case: a prior local run (or a cache hit) left
+    the extracted files on this machine, so a matching sha really does mean
+    there's nothing new to do."""
     monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
     monkeypatch.setattr(dl, "RAW_DIR", tmp_path / "raw")
     monkeypatch.setattr(dl, "META_PATH", tmp_path / "scrape_meta.json")
 
     zip_bytes = _full_zip()
     sha = hashlib.sha256(zip_bytes).hexdigest()
-    dl.save_meta({"legacy": {"sha256": sha, "retrieved_at": "2026-09-01"}})
+    extracted = dl.extract_members(zip_bytes, tmp_path / "raw" / "legacy" / "2026-09-01")
+    dl.save_meta({
+        "legacy": {
+            "sha256": sha, "retrieved_at": "2026-09-01",
+            "path": "raw/legacy/2026-09-01", "members": extracted,
+        }
+    })
     monkeypatch.setattr(dl, "fetch_zip", lambda url, **kw: zip_bytes)
 
     result = dl.download_legacy(user_agent="test-agent", run_date=date(2026, 9, 11))
 
     assert result == {"skipped": True, "sha256": sha}
     assert not (tmp_path / "raw" / "legacy" / "2026-09-11").exists()
+
+
+def test_download_legacy_reextracts_when_sha_matches_but_files_are_missing(
+    tmp_path, monkeypatch, capsys
+):
+    """The real bug found running this on a fresh CI runner: scrape_meta.json
+    is committed (a receipt), but the extracted files under data/raw/legacy/
+    are gitignored -- a fresh checkout/cache can have matching metadata and
+    zero actual files. Skipping in that case leaves normalize_legacy.py with
+    nothing to read. A matching sha must not skip unless the files are
+    actually here."""
+    monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(dl, "RAW_DIR", tmp_path / "raw")
+    monkeypatch.setattr(dl, "META_PATH", tmp_path / "scrape_meta.json")
+
+    zip_bytes = _full_zip()
+    sha = hashlib.sha256(zip_bytes).hexdigest()
+    # Metadata claims a prior capture, but raw/legacy/2026-09-01/ was never
+    # actually created on this machine -- e.g. a fresh CI cache miss.
+    dl.save_meta({
+        "legacy": {
+            "sha256": sha, "retrieved_at": "2026-09-01",
+            "path": "raw/legacy/2026-09-01",
+            "members": {"formc1.txt": 123},
+        }
+    })
+    monkeypatch.setattr(dl, "fetch_zip", lambda url, **kw: zip_bytes)
+
+    result = dl.download_legacy(user_agent="test-agent", run_date=date(2026, 9, 11))
+
+    assert result["skipped"] is False
+    assert (tmp_path / "raw" / "legacy" / "2026-09-11" / "formc1.txt").exists()
+    assert "isn't present on this machine" in capsys.readouterr().out
 
 
 def test_download_legacy_warns_and_recaptures_on_changed_sha(tmp_path, monkeypatch, capsys):

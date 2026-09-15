@@ -114,11 +114,30 @@ def download_legacy(
     sha256 = hashlib.sha256(zip_bytes).hexdigest()
 
     if previous and previous["sha256"] == sha256 and not force:
-        print(
-            f"  unchanged since {previous['retrieved_at']} "
-            f"(sha256 {sha256[:12]}...), skipping extraction"
+        # scrape_meta.json is committed (small, a receipt of what was
+        # pulled); the extracted files under data/raw/legacy/ are not (see
+        # .gitignore) -- they only exist via the CI cache or a prior local
+        # run. A matching sha alone doesn't mean this checkout HAS them: a
+        # fresh CI runner whose cache never included a legacy/ entry (e.g.
+        # the first run after this step was added) inherits committed
+        # metadata pointing at a directory that was never actually
+        # populated here. Confirmed the hard way: normalize_legacy.py
+        # failed with "no dated pull" right after this step logged
+        # "skipping extraction" on exactly that runner.
+        previous_dir = DATA_DIR / previous["path"]
+        have_all_members = previous_dir.is_dir() and all(
+            (previous_dir / name).exists() for name in previous.get("members", {})
         )
-        return {"skipped": True, "sha256": sha256}
+        if have_all_members:
+            print(
+                f"  unchanged since {previous['retrieved_at']} "
+                f"(sha256 {sha256[:12]}...), skipping extraction"
+            )
+            return {"skipped": True, "sha256": sha256}
+        print(
+            f"  sha256 unchanged since {previous['retrieved_at']}, but "
+            f"{previous_dir} isn't present on this machine -- extracting anyway"
+        )
 
     if previous and previous["sha256"] != sha256:
         print(
