@@ -1,5 +1,19 @@
 requests==2.32.5
 
+# scripts/build_financial_interests.py's PDF pipeline. pypdf/pdfminer.six read
+# a text layer when one exists; PyMuPDF (imported as `fitz`) renders a page to
+# an image and Pillow wraps it for pytesseract when it doesn't. Confirmed
+# 2026-09-14: most Manual (scanned-paper) C-1 filings have no text layer at
+# all, so the OCR path is the common case for that population, not a
+# fallback -- see that script's module docstring. pytesseract also needs the
+# `tesseract` binary on PATH (a system package, not pip-installable); the
+# workflow YAML for this phase will need to install it.
+pypdf>=5.0
+pdfminer.six>=20240706
+PyMuPDF>=1.24
+pytesseract>=0.3.10
+Pillow>=10.0
+
 # Test suite (tests/). No network, no data/ -- meant to run before any download
 # so a broken parser or a schema drift is caught before we trust what we fetched.
 pytest>=7.0

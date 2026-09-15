@@ -1,0 +1,39 @@
+ITEM 1 YOUR NAME, ADDRESS AND PHONE NUMBER
+ Name Ackerman Kelli M Telephone No. 308-991-6406
+LAST FIRST MIDDLE
+ITEM 2 OCCASION FOR FILING (Check Appropriate Box)
+ Annual officeholder's or state employee's report
+ITEM 6 SOURCES OF INCOME OF OVER $1,000
+Income includes money or any other form of recompense constituting income under the Internal Revenue Code. (See definitions)
+1.) Country Partners Cooperative 1a.) Farm Income
+P.O. Box 80
+Gothenburg NE 69138
+2.) 2a.)
+3.) 3a.)
+4.) 4a.)
+ITEM 7 BUSINESSES WITH WHICH YOU ARE ASSOCIATED  Including Non Profits (See definitions)
+If you have nothing to report, write NONE
+1.) Nebraska Council of School Administrators (NCSA) 1a.) Past Member, Executive Board
+455 S. 11th Street, Suite A
+Lincoln, NE 68508
+2.) Nebraska Association of School Business Officials (NASBO) 2a.) Past President, Executive Board
+455 S. 11th Street, Suite A
+Lincoln, NE 68508
+3.) 3a.)
+ITEM 8 REAL PROPERTY OF THE FILER IN NEBRASKA
+If you have nothing to report, write NONE
+Jeffrey Lake Cabin#50 Lot 15, Area 4 S-9(Imp only) 6 B G TP, 50 So.
+Lakeview Rd, Lincoln Co, NE
+Residential Cabin
+ITEM 10 CREDITORS TO WHOM $1,000 OR MORE WAS OWED
+If you have nothing to report, write NONE
+Mazda Capital Services c/o Chase P.O. Box 78232, Phoeniz AZ 85062-8232
+ITEM 11 SOURCES OF GIFTS OF A VALUE OF MORE THAN $100 RECEIVED EXCEPT GIFTS FROM RELATIVES.
+If you have nothing to report, write NONE
+NONE Choose Value:
+Choose Value:
+ITEM 12 SUPPLEMENTAL INFORMATION (please attach any supplemental info and note below to see attached)
+ITEM 13 SIGNATURE OF FILER AND DATE
+I hereby state that I have used all reasonable diligence in the preparation of this Statement.
+General Information - Filing Requirements
+ITEM 6 in the instructions text should never be parsed as data.
