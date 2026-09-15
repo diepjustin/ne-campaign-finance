@@ -1,11 +1,17 @@
 # Nebraska Campaign Finance
 
-**Status: build phases 1–2 done.** Both bulk extracts download, validate and normalize
-across 2022–2026: **207,259 raw rows → 116,982 contributions, 549 loans, 2,780 other
-receipts, 86,948 expenditures, of which 5,928 are independent expenditures.** 43 tests.
-Phases 3, 5 and 6 (the registry, the site, automation) are still plan. **Phase 4 is
-mostly gone** — independent expenditures turned out to be in the bulk extract, not
-behind the search UI.
+**Status: modern extract (2022+) and pre-2022 legacy data both normalized, plus a
+searchable page.** Modern: **207,259 raw rows → 116,982 contributions, 549 loans, 2,780
+other receipts, 86,948 expenditures, of which 5,928 are independent expenditures.**
+Legacy (`normalize_legacy.py`, pre-2022, from the state's own frozen `nadc_data.zip`):
+**253,552 contributions, 110 loans, 1,205 other receipts, 125,809 expenditures** across
+nine forms spanning back to 2000 — including three real classification calls (an
+Independent Expenditure nature code buried in a contributions-shaped form, a Loan nature
+code likewise, two undocumented expenditure codes) made deliberately by the project
+owner rather than guessed, see `normalize_legacy.py`'s module docstring. A search page
+(`?q=`) at `index.html` covers the modern era. 76 tests. The committee/candidate
+registry and C-1/C-2 disclosures are separate, still-open work (`ne-connect/PLAN.md`
+1.5).
 
 A journalism and accountability tool for collecting and publishing Nebraska campaign
 finance records — contributions, loans, expenditures, independent expenditures, and the
@@ -211,6 +217,24 @@ The three receipt tables partition the contributions extract exactly — every r
 lands in one of them, none twice. Columns are snake_case, dates ISO, amounts floats,
 and every row carries `source_year` and `source_snapshot` so a published number traces
 back to a specific pull.
+
+### The legacy tables (pre-2022)
+
+`normalize_legacy.py` reads the nine contribution/expenditure forms
+`download_legacy.py` pulls from the state's frozen `nadc_data.zip` (see "Tier 2" below)
+and maps them into the same canonical columns as the tables above, plus `era` (always
+`"pre2022"` here) and `source_form` (which of the nine raw forms a row came from).
+
+| File | Rows | What it is |
+|---|---:|---|
+| `contributions_legacy.csv` | 253,552 | same shape as `contributions.csv`, 2000–2022 |
+| `loans_legacy.csv` | 110 | formb5's Loan-nature rows, kept out of contributions like the modern table does |
+| `other_receipts_legacy.csv` | 1,205 | bare pledges and unclassified nature codes |
+| `expenditures_legacy.csv` | 125,809 | includes formb73's Independent Expenditure rows — a contributions-shaped form that also reports the filer's own spending |
+
+Never merged into `contributions.csv`/`expenditures.csv`/`loans.csv` — those stay
+2022+ only. A consumer wanting the full history reads both eras and unions them,
+keyed by `era`.
 
 ## Architecture
 
