@@ -1,0 +1,618 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="ctl00_Head1">
+     <script type = "text/javascript" >
+         history.pushState(null, null, 'PublicMaster.master');
+         window.addEventListener('popstate', function (event) {
+             history.pushState(null, null, 'PublicMaster.master');
+         });
+    </script>
+    <link rel="Stylesheet" href="/PublicSite/Resources/CSS/style.css" /><link rel="Stylesheet" href="/PublicSite/Resources/CSS/GridStyle.css" type="text/css" /><link rel="Stylesheet" href="/PublicSite/Resources/CSS/smoothness/jquery-ui-1.8.12.custom.css" type="text/css" />
+    <!--[if IE 7]>
+	        <link rel="stylesheet" type="text/css" href="/PublicSite/Resources/CSS/ie7.css" />
+        <![endif]-->
+         
+         <!--[if IE 8]>
+	        <link rel="stylesheet" type="text/css" href="/PublicSite/Resources/CSS/ie8.css" />
+        <![endif]-->
+
+    <!--[if IE 9]>
+	        <link rel="stylesheet" type="text/css" href="/PublicSite/Resources/CSS/ie8.css" />
+        <![endif]-->
+
+    <!-- Javascript File Imports -->
+    <script language="javascript" src="/PublicSite/Resources/Script/jquery/js/jquery-1.10.2.js"
+        type="text/javascript"></script>
+    <script language="javascript" src="/PublicSite/Resources/Script/jquery/js/jquery-ui-1.10.4.custom.min.js"
+        type="text/javascript"></script>
+    <script language="javascript" src="/PublicSite/Resources/Script/jqueryControlInitialize.js"
+        type="text/javascript"></script>
+    <script language="javascript" src="/PublicSite/Resources/Script/jquery/js/maskedinput.js" type="text/javascript"></script>
+    <title>
+	Financial Disclosure Search
+</title><link rel="stylesheet" type="text/css" href="/PublicSite/XMLConfigs/ConfigurableStyle.css" /></head>
+<body style="width: 95%;">
+   
+     
+    
+    <!-- Skip Navigation -->
+    <ul class="offscreen">
+        <li><a href="#page-body" accesskey="C" title="Skip Navigation: Alt+C">Skip Navigation</a></li>
+    </ul>
+    <!-- End Skip Navigation -->
+    <form method="post" action="./Search.aspx?SearchTypeCodeHook=86C705B4-76BE-4FD9-B9A0-B607711F8A3A" id="aspnetForm" style="width: 100%">
+<input type="hidden" name="ctl00_ToolkitScriptManager1_HiddenField" id="ctl00_ToolkitScriptManager1_HiddenField" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKLTQ5NDMwNDQ2Ng9kFgJmD2QWBGYPZBYCAgsPZBYCZg8WAh4EVGV4dAUbRmluYW5jaWFsIERpc2Nsb3N1cmUgU2VhcmNoZAIBD2QWBgIBD2QWAgIBD2QWAgICDxYCHgdWaXNpYmxlZ2QCBQ9kFgJmD2QWBgIBD2QWBgIBDw8WAh8BZ2QWAgIBDw8WAh8ABSdTdGF0ZW1lbnRzIG9mIEZpbmFuY2lhbCBJbnRlcmVzdHMgKEMtMSlkZAIDD2QWAmYPZBYCZg9kFgJmD2QWFmYPDxYGHwAFBEhvbWUeB1Rvb2xUaXAFJkNsaWNrIGhlcmUgdG8gcmV0dXJuIHRvIHRoZSBob21lIHBhZ2UuHwFnZGQCAQ8PFgIfAWdkZAICDw8WAh8BaGRkAgMPDxYCHwFoZGQCBA8PFgIfAWhkZAIFDw8WAh8BaGRkAgYPDxYCHwFoZGQCBw8PFgIfAWhkZAIIDw8WAh8BaGRkAgkPDxYCHwFoZGQCCg8PFgQfAAUnU3RhdGVtZW50cyBvZiBGaW5hbmNpYWwgSW50ZXJlc3RzIChDLTEpHwFnZGQCBQ9kFgJmD2QWBGYPZBYCZg8PFgIfAGVkZAIBD2QWAmYPDxYCHgtOYXZpZ2F0ZVVybAUuaHR0cDovL25hZGMtZS5uZWJyYXNrYS5nb3YvUHVibGljU2l0ZS9GQVEuYXNweGRkAgcPEGRkFgBkAgsPEGRkFgBkAgcPZBYCAgEPZBYCZg8PZBYCHgpkYXRhLWNmZ2lkZBYGAgEPDxYEHghDc3NDbGFzcwUNIExhYmVsQ29udHJvbB4EXyFTQgICFgIfBAUPUEZEU2VhcmNoSGVhZGVyZAICDw8WBB8FBQ0gTGFiZWxDb250cm9sHwYCAhYCHwQFDEluc3RydWN0aW9uc2QCAw8PFgQeDVBhZ2luZ09wdGlvbnMXAwUIUGFnZVNpemUCCgUIU1FMUGFnZWRnBQlQYWdlSW5kZXhmHhBsYXN0U2VhcmNoUGFyYW1zFwkFCVBhZ2VJbmRleGYFCk9mZmljZUhlbGRlBQhTUUxQYWdlZGcFC0ZpbGVkTWV0aG9kBQNBbGwFCVRvdGFsUm93c2UFCkZpbGluZ1llYXIFBDIwMjMFCExhc3ROYW1lZQUIUGFnZVNpemUCCgUMT2ZmaWNlU291Z2h0ZRYCHwQFDG1nclBGRFNlYXJjaBYKZg8PFgIfAGVkZAIBDw8WBB8FBQ0gR3JvdXBNYW5hZ2VyHwYCAhYCHwQFD21nclNlYXJjaFBhcmFtcxYOZg8PFgIfAGVkZAIBDw8WCB8FBRQgRHJvcERvd25MaXN0Q29udHJvbB4KaXNSZXF1aXJlZGgeCFJlcXVpcmVkaB8GAgIWAh8EBQpGaWxpbmdZZWFyFgRmDw8WAh8ABQtGaWxpbmcgWWVhcmRkAgEPEA8WBh4NRGF0YVRleHRGaWVsZAUKRmlsaW5nWWVhch4ORGF0YVZhbHVlRmllbGQFCkZpbGluZ1llYXIeC18hRGF0YUJvdW5kZ2QQFQoABDIwMTgEMjAxOQQyMDIwBDIwMjEEMjAyMgQyMDIzBDIwMjQEMjAyNQQyMDI2FQoABDIwMTgEMjAxOQQyMDIwBDIwMjEEMjAyMgQyMDIzBDIwMjQEMjAyNQQyMDI2FCsDCmdnZ2dnZ2dnZ2dkZAICDw8WDB4Nc3RyQ3RybE5vdGlmeQVJY3RsMDBfQ29udGVudF84NmM3MDViNC03NmJlLTRmZDktYjlhMC1iNjA3NzExZjhhM2FfbWdyUEZEU2VhcmNoX2J0blNlYXJjaB8FBQwgVGV4dENvbnRyb2weDnZhbGlkYXRpb25UeXBlBQRUZXh0HwloHwpoHwYCAhYCHwQFCExhc3ROYW1lFgRmDw8WAh8ABQlMYXN0IE5hbWVkZAICDw8WAh8BaGRkAgMPDxYIHwUFFCBEcm9wRG93bkxpc3RDb250cm9sHwloHwpoHwYCAhYCHwQFC0ZpbGVkTWV0aG9kFgRmDw8WAh8ABQxGaWxlZCBNZXRob2RkZAIBDxBkEBUDA0FsbApFbGVjdHJvbmljBk1hbnVhbBUDA0FsbApFbGVjdHJvbmljBk1hbnVhbBQrAwNnZ2dkZAIEDw8WDB8OBUljdGwwMF9Db250ZW50Xzg2YzcwNWI0LTc2YmUtNGZkOS1iOWEwLWI2MDc3MTFmOGEzYV9tZ3JQRkRTZWFyY2hfYnRuU2VhcmNoHwUFDCBUZXh0Q29udHJvbB8PBQRUZXh0HwloHwpoHwYCAhYCHwQFCk9mZmljZUhlbGQWBGYPDxYCHwAFFE9mZmljZS9Qb3NpdGlvbiBIZWxkZGQCAg8PFgIfAWhkZAIFDw8WDB8OBUljdGwwMF9Db250ZW50Xzg2YzcwNWI0LTc2YmUtNGZkOS1iOWEwLWI2MDc3MTFmOGEzYV9tZ3JQRkRTZWFyY2hfYnRuU2VhcmNoHwUFDCBUZXh0Q29udHJvbB8PBQRUZXh0HwloHwpoHwYCAhYCHwQFDE9mZmljZVNvdWdodBYEZg8PFgIfAAUNT2ZmaWNlIFNvdWdodGRkAgIPDxYCHwFoZGQCBg8PFgQfCWgfCmgWAh8EBRBQRkRfRmlsaW5nQ29kZUlEFgRmDw8WAh8ABRBGaWxpbmcgUmVhc29uKHMpZGQCAQ8QDxYGHwsFC0Rlc2NyaXB0aW9uHwwFEFBGRF9GaWxpbmdDb2RlSUQfDWdkEBUFH0EgY2FuZGlkYXRlIGZvciBlbGVjdGl2ZSBvZmZpY2UwQW5udWFsIG9mZmljZWhvbGRlcidzIG9yIHN0YXRlIGVtcGxveWVlJ3MgcmVwb3J0F0xlZnQgb2ZmaWNlIG9yIHBvc2l0aW9uJU5ld2x5IGFwcG9pbnRlZCB0byBvZmZpY2Ugb3IgcG9zaXRpb24YU3VwcGxlbWVudGFsIEluZm9ybWF0aW9uFQUkNjg3M0UzNEYtRkFGNC00QjY2LUJEQjMtRUQ5MUY3NUNERjY5JEFBMTNGNDY0LUM4M0EtNEQ4QS05MTRGLTNGODBGOUYyNDhBMSQ3RDYyQ0Y4Qy02RjYyLTQ2N0MtQTcwMy00NjA1MThFNjZCMDMkQzZBQUEwREMtRTJDMS00NDM2LThBMjMtMjFDNzczMzRGNzczJDdBNTlFQzIzLTE1RTctNEY2RS1BNzlDLTFCOTg1MEQ0NTk3QxQrAwVnZ2dnZ2RkAgIPDxYEHwUFDiBCdXR0b25Db250cm9sHwYCAhYCHwQFCWJ0blNlYXJjaBYCAgEPDxYEHhFVc2VTdWJtaXRCZWhhdmlvcmgeDU9uQ2xpZW50Q2xpY2sFL3RoaXMuZGlzYWJsZWQ9dHJ1ZTt0aGlzLnZhbHVlPSdQbGVhc2UgV2FpdC4uLic7ZGQCAw8PFgQfBQUOIEJ1dHRvbkNvbnRyb2wfBgICFgIfBAUIYnRuUmVzZXQWAgIBDw8WBB8QaB8RBS90aGlzLmRpc2FibGVkPXRydWU7dGhpcy52YWx1ZT0nUGxlYXNlIFdhaXQuLi4nO2RkAgQPD2QWAh8EBRBtZ3JTZWFyY2hSZXN1bHRzFgQCAQ8WAh8BZ2QCAg8PZBYCHwQFD21nclJlcG9ydFZpZXdlchYEZg8PFgIfAGVkZAIBDw8WFB4IUGFnZVNpemUCCh4PU2VsZWN0QXZhaWxhYmxlZh4HQ29sdW1uczLYAgABAAAA/////wEAAAAAAAAADAIAAABDQ29uZmlndXJhYmxlLCBWZXJzaW9uPTEuMS4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAQBAAAAgQFTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW0NvbmZpZ3VyYWJsZS5HcmlkQ29sdW1uLCBDb25maWd1cmFibGUsIFZlcnNpb249MS4xLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj1udWxsXV0DAAAABl9pdGVtcwVfc2l6ZQhfdmVyc2lvbgQAABlDb25maWd1cmFibGUuR3JpZENvbHVtbltdAgAAAAgICQMAAAAAAAAAAAAAAAcDAAAAAAEAAAAAAAAABBdDb25maWd1cmFibGUuR3JpZENvbHVtbgIAAAALHglSb3dGaWx0ZXJlHg5Tb3J0RXhwcmVzc2lvbmUfBgICHwUFDCBHcmlkQ29udHJvbB4HaXNEaXJ0eQUFRmFsc2UeD3N1cHByZXNzQ29sdW1uczLYAgABAAAA/////wEAAAAAAAAADAIAAABDQ29uZmlndXJhYmxlLCBWZXJzaW9uPTEuMS4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAQBAAAAgQFTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW0NvbmZpZ3VyYWJsZS5HcmlkQ29sdW1uLCBDb25maWd1cmFibGUsIFZlcnNpb249MS4xLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj1udWxsXV0DAAAABl9pdGVtcwVfc2l6ZQhfdmVyc2lvbgQAABlDb25maWd1cmFibGUuR3JpZENvbHVtbltdAgAAAAgICQMAAAAAAAAAAAAAAAcDAAAAAAEAAAAAAAAABBdDb25maWd1cmFibGUuR3JpZENvbHVtbgIAAAALHgtTZWxlY3RDb3VudGYWAh8EBQZncmRQRkQWAmYPDxYCHwBlZGQYAgUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgoFaGN0bDAwJENvbnRlbnQkODZjNzA1YjQtNzZiZS00ZmQ5LWI5YTAtYjYwNzcxMWY4YTNhJG1nclBGRFNlYXJjaCRtZ3JTZWFyY2hQYXJhbXMkUEZEX0ZpbGluZ0NvZGVJRCRjdGwwMSQwBWhjdGwwMCRDb250ZW50JDg2YzcwNWI0LTc2YmUtNGZkOS1iOWEwLWI2MDc3MTFmOGEzYSRtZ3JQRkRTZWFyY2gkbWdyU2VhcmNoUGFyYW1zJFBGRF9GaWxpbmdDb2RlSUQkY3RsMDEkMQVoY3RsMDAkQ29udGVudCQ4NmM3MDViNC03NmJlLTRmZDktYjlhMC1iNjA3NzExZjhhM2EkbWdyUEZEU2VhcmNoJG1nclNlYXJjaFBhcmFtcyRQRkRfRmlsaW5nQ29kZUlEJGN0bDAxJDIFaGN0bDAwJENvbnRlbnQkODZjNzA1YjQtNzZiZS00ZmQ5LWI5YTAtYjYwNzcxMWY4YTNhJG1nclBGRFNlYXJjaCRtZ3JTZWFyY2hQYXJhbXMkUEZEX0ZpbGluZ0NvZGVJRCRjdGwwMSQzBWhjdGwwMCRDb250ZW50JDg2YzcwNWI0LTc2YmUtNGZkOS1iOWEwLWI2MDc3MTFmOGEzYSRtZ3JQRkRTZWFyY2gkbWdyU2VhcmNoUGFyYW1zJFBGRF9GaWxpbmdDb2RlSUQkY3RsMDEkNAVoY3RsMDAkQ29udGVudCQ4NmM3MDViNC03NmJlLTRmZDktYjlhMC1iNjA3NzExZjhhM2EkbWdyUEZEU2VhcmNoJG1nclNlYXJjaFBhcmFtcyRQRkRfRmlsaW5nQ29kZUlEJGN0bDAxJDQFVmN0bDAwJENvbnRlbnQkODZjNzA1YjQtNzZiZS00ZmQ5LWI5YTAtYjYwNzcxMWY4YTNhJG1nclBGRFNlYXJjaCRtZ3JTZWFyY2hSZXN1bHRzJGN0bDAzBVZjdGwwMCRDb250ZW50JDg2YzcwNWI0LTc2YmUtNGZkOS1iOWEwLWI2MDc3MTFmOGEzYSRtZ3JQRkRTZWFyY2gkbWdyU2VhcmNoUmVzdWx0cyRjdGwwNAVWY3RsMDAkQ29udGVudCQ4NmM3MDViNC03NmJlLTRmZDktYjlhMC1iNjA3NzExZjhhM2EkbWdyUEZEU2VhcmNoJG1nclNlYXJjaFJlc3VsdHMkY3RsMDUFVmN0bDAwJENvbnRlbnQkODZjNzA1YjQtNzZiZS00ZmQ5LWI5YTAtYjYwNzcxMWY4YTNhJG1nclBGRFNlYXJjaCRtZ3JTZWFyY2hSZXN1bHRzJGN0bDA2BW1jdGwwMCRDb250ZW50JDg2YzcwNWI0LTc2YmUtNGZkOS1iOWEwLWI2MDc3MTFmOGEzYSRtZ3JQRkRTZWFyY2gkbWdyU2VhcmNoUmVzdWx0cyRtZ3JSZXBvcnRWaWV3ZXIkZ3JkUEZEJGN0bDAxDzwrAAwBCAKbAmQBcy+BHuirrbrfkEIL3D+MSEcdKrbqrj1mZ/1flvGrpw==" />
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+            var Configurable = (function () {
+                var module = {};
+
+                //public properties
+                module.NotifyControl;
+                module.rteInitialized = false;
+
+                //private functions
+                function handleDatePickerSetup () {
+                    $('.datepicker').datepicker({
+                        showOn: 'button',
+                        //buttonImage: '/CampaignFinance/images/calendar.png',
+                        buttonImage: '/PublicSite/images/calendar.png',
+                        buttonImageOnly: true,
+                        changeMonth: true,
+                        changeYear: true
+                    });
+                }
+
+                function handleMaskSet() {
+                    $('.Phone').mask('(999) 999-9999');
+                    $('.PhoneX').mask('(999) 999-9999? x999999');
+                }
+                
+                function handleCollapsibleSetup() {
+                    $('.collapsible').each(function () {
+                        var open = ($(this).attr('data-open') === 'True') ? 0 : 1;
+                        $(this).accordion({
+                            active: open,
+                            collapsible: true,
+                            autoHeight: false,
+                            heightStyle:'content',
+                            beforeActivate: function () {
+                                var isOpen = $(this).accordion('option', 'active') === 0 ? 'False': 'True',
+                                cookiestring = getCookie('collapsible');
+                                document.cookie = 'collapsible=' + setCookieString($(this).attr('data-strName'), isOpen, cookiestring);
+                            }
+                        }).removeClass('ui-widget');
+                    });
+                }
+
+                function setGridStrikeThrough() {
+                    $('.rowstrikethrough td').each(function () {
+                        if (!$(this).has('a').length > 0) {
+                            $(this).css('text-decoration', 'line-through');
+                        } else {
+                            $(this).css('text-decoration', 'none');
+                        }
+                    });
+                }
+
+                function setCookieString(name, value, cookiestring) {
+                    if(cookiestring == undefined){cookiestring = '';}
+                    var keyvaluestring = cookiestring.split('&'),
+                    pairs = {};
+                    for(var i = 0; i < keyvaluestring.length; i++){
+                        keyvalue = keyvaluestring[i].split('=');
+                        pairs[keyvalue[0]] = keyvalue[1];
+                    }
+                    pairs[name] = value;
+                    var outstring = '';
+                    for (var key in pairs) {
+                        if (outstring.length > 0) {
+                            outstring += '&';
+                        }
+                        outstring += key + '=' + pairs[key];
+                    }
+                    return outstring;
+                }
+
+                function getCookie(cookiename) {
+                    var name = cookiename + '=';
+                    var c = document.cookie.split(';');
+                    for (var i = 0; i < c.length; i++) {
+                        var thiscookie = c[i];
+                        while (thiscookie.charAt(0) == ' ') thiscookie = thiscookie.substring(1);
+                        if (thiscookie.indexOf(name) != -1) return thiscookie.substring(name.length, thiscookie.length);
+                    }
+                    return;
+                }
+
+                function handleReportViewer(){
+                    $('.report_minimize').on('click', function(e){
+                        //$(this).parent().removeAttr('style');
+                        $(this).parent().css({'width':'80%', 'height': '90%', 'left': '10%', 'top':'10%'});
+                        $(this).parent().find('.report_fullscreen').css('display', 'inline');
+                        $(this).css('display', 'none');
+                        e.preventDefault();
+                        return false;
+                    });
+                    $('.report_fullscreen').on('click', function(e){
+                        $(this).parent().css({'width':'100%','height':'100%','left':'0','top':'0'});
+                        $(this).parent().find('.report_minimize').css('display', 'inline');
+                        $(this).css('display', 'none');
+                        e.preventDefault();
+                        return false;
+                    });
+                    $('.report_close').on('click', function(e){
+                        $(this).parent().css('display', 'none');
+                        e.preventDefault();
+                        return false;
+                    });
+                }
+
+                function handleInputOnFocus(){
+                    $('[data-focus]').on('focus', function(e){
+                        Configurable.NotifyControl = $(this).attr('data-focus');
+                    });
+                    $('[data-focus]').on('blur', function(e){
+                        if(Configurable.NotifyControl == $(this).attr('data-focus')) {
+                            Configurable.NotifyControl = undefined;
+                        }
+                    });
+                    $(document).on('keypress', Configurable.KeypressListener);
+                }
+
+                function handleRichTextEditor(){
+                    if(window.richTextEditor != undefined){
+                        //need to intercept the form submit to call Configurable.submitForm first
+                        window.WebForm_OnSubmit = Configurable.submitForm;	                
+
+                    }
+                }
+
+                function handleGridViewCheckBox(){
+                    $('.GridViewCheckBox input').change(function () {
+                        //set a listener for when this checkbox changes
+                        cookiestring = getCookie('GridViewCheckBox');
+                        var cookieid;
+                        var pkvalue = $(this).attr('primarykey');
+                        if(typeof pkvalue !== typeof undefined && pkvalue !== false) {
+                            cookieid = pkvalue;
+                        } else {
+                            cookieid = $(this).attr('id');
+                        }
+                        document.cookie = 'GridViewCheckBox=' + setCookieString(cookieid, $(this).is(':checked'), cookiestring);
+                        Configurable.checkGridSelect(this);
+                    });
+                    //clear out any extant cookies
+                    document.cookie = 'GridViewCheckBox=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                }
+
+                function handleTextMaxLength(){
+                    $('textarea[maxlength]').bind('input propertychange', function() {
+                        var maxLength = $(this).attr('maxlength');
+                        if($(this).val().length > maxLength) {
+                            $(this).val($(this).val().substring(0, maxLength));
+                        }
+                    });
+                    $('.TextControl[maxlength]').bind('input propertychange', function() {
+                        var maxLength = $(this).attr('maxlength');
+                        if($(this).val().length > maxLength) {
+                            $(this).val($(this).val().substring(0, maxLength));
+                        }
+                    });
+                }
+
+                //public functions
+                module.initialize = function () {
+                    handleDatePickerSetup();
+                    handleMaskSet();
+                    handleCollapsibleSetup();
+                    setGridStrikeThrough();
+                    handleReportViewer();
+                    handleInputOnFocus();
+                    handleRichTextEditor();
+                    handleGridViewCheckBox();
+                    handleTextMaxLength();
+                }
+
+                module.KeypressListener = function (event) {
+                    if(event.which == 13 && !event.shiftKey) { //enter key
+
+                        if(Configurable.NotifyControl != undefined){
+                            event.preventDefault();
+                            $('#' + Configurable.NotifyControl + ', #' + Configurable.NotifyControl + ' input').click(); //trigger a click event on notify control or any input children of it
+                            return false;
+                        }
+                    }
+                }
+
+                module.submitForm = function() {
+                    //make sure hidden and iframe values are in sync for all rtes before submitting form
+                    generateXHTML = false;
+                    encodeHTML = true;
+                    updateRTEs();
+	                //Copy the hidden RTE Input values back to the original asp controls
+                    var vRTEs = allRTEs.split(';');
+			        for (var i = 0; i < vRTEs.length; i++) {
+				        var baseID = vRTEs[i].replace('_rte','');
+                        var textValue = $('#hdn'+vRTEs[i]).val();
+                        $('#'+baseID).val(textValue);
+			        }
+                    if (typeof(ValidatorOnSubmit) == 'function' && ValidatorOnSubmit() == false) return false;
+                    return true;
+                    
+                }
+                
+                module.handlePopup = function(source) {
+                    //check to see if a popover window already exists
+                    if(!($('#iframePopup').length)) {
+                        var popupwindow = '<div style=\'position:fixed;width:80%;height:80%;left:10%;top:10%;border-left:10px;background-color:gray;\' id=\'iframePopup\'>';
+                        popupwindow += '\t<button class=\'report_close\' style=\'float:right;margin:5px;\'>Close</button>';
+                        popupwindow += '\t<button class=\'report_minimize\' style=\'display:none;float:right;margin:5px;\'>Minimize</button>';
+                        popupwindow += '\t<button class=\'report_fullscreen\' style=\'float:right;margin:5px;\'>Full Screen</button>';
+                        popupwindow += '\t<iframe src='+source+' style=\'width:99.5%;height:90%;position:absolute;left:0.25%;bottom:2%;\'/>';
+                        popupwindow += '</div>';
+                        $('body').append(popupwindow);
+                        handleReportViewer();
+                    } else {
+                        $('#iframePopup iframe').attr('src', source);
+                        $('#iframePopup').css('display', 'block');
+                    }
+                }
+
+                module.closePopup = function() {
+                    var popupFrame = $('#iframePopup', window.parent.document);
+                    popupFrame.css('display', 'none');
+                }
+
+                module.setClientValue = function(context, values) {
+                    $.each(values, function(key, value){
+                        var control;
+                        if(context === undefined)
+                            control = $('[data-cfgid='+key+'] input', window.parent.document);
+                        else
+                            control = $('#' + context + ' [data-cfgid='+key+'] input', window.parent.document);
+                        if(control != undefined && control.length > 0){
+                            control.val(value);
+                            control[0].onchange();
+                        }
+                    });
+                }
+
+                module.goToPage = function(url){
+                    window.parent.location.href = url;
+                }
+
+                module.checkGridSelect = function(source) {
+                    //evaluate every checkbox that's visible in a table and see if it matches the base
+                    var table = source.parentElement.parentElement.parentElement.parentElement;
+                    
+                    Configurable.checkSelectSource = source;
+                    Configurable.selectCount = 0;
+                    Configurable.gridCount = 0;
+
+                    $(table).children('tr').each(function(index, element){
+                        var checkbox = $(this).find("input[type='checkbox']");
+                        if(index > 0)
+                        {
+                            if(checkbox.is(":checked"))
+                                Configurable.selectCount++;
+                            //$(this).find("input[type='checkbox']").get(0) === $(Configurable.checkSelectSource).get(0)
+                            if(checkbox.length > 0)
+                                Configurable.gridCount++;
+                        }
+                        else
+                        {
+                            Configurable.headerChecked = checkbox.is(":checked");
+                            Configurable.selectHeader = checkbox;
+                            if(checkbox.get(0) === $(Configurable.checkboxSelectSource).get(0))
+                                return false;
+                        }
+                    });
+                    if(Configurable.gridCount > 0)
+                    {
+                        if(Configurable.headerChecked && Configurable.gridCount != Configurable.selectCount)
+                        {
+                            //set the header and trigger a postback
+                            Configurable.selectHeader.prop("checked", false);
+                            setTimeout('__doPostBack($(Configurable.checkSelectSource).prop("name"),\'\')', 0);
+                        }
+                        else if(!Configurable.headerChecked && Configurable.gridCount == Configurable.selectCount)
+                        {
+                            //set the header and trigger a postback
+                            Configurable.selectHeader.prop("checked", true);
+                            setTimeout('__doPostBack($(Configurable.checkSelectSource).prop("name"),\'\')', 0);
+                        }
+                        else if (Configurable.selectCount == 0 || (Configurable.selectCount == 1 && $(Configurable.checkSelectSource).is(":checked"))) 
+                        {
+                            //Only checked checkbox has been unchecked or first checkbox has been checked. Postback
+                            setTimeout('__doPostBack($(Configurable.checkSelectSource).prop("name"),\'\')', 0);
+                        }
+                    }
+                }
+
+                return module;
+            }());
+            
+            $(Configurable.initialize);
+        //]]>
+</script>
+
+<script src="/PublicSite/ScriptResource.axd?d=fhqmINr4VPIx2BLAB858YT9kOfsxyHEJzwLPrcteD5unjnrcGD3hgpjLdzeSr-9n5HOSTh29QHBiRW2sPdVXn95_HBc1iQyena4aFtr3pZOrOVv8Ekp3vDRIyyQhBu9NeXH2gNcdVOUnNNGBMCLd0g2&amp;t=5f8643ea" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="7EAEBAAE" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdADaYhHORy9wn+XQK08XFvH/7WpIE2NJ9SwFaB3DJjj3DZuAywAb49VNHqK8wgbuybvwD0/5GoIKgzfV0S4Gx0mMg85L+VmATg2DZusSBZ7kfw2TDRQ+AtUu02xyLxgaz+R4j9NuuKBMxvNC5Y1930eSEH/I8kqZZ7yiVWpNv410R4UMKgFEYdFJhd+ifMO5dIL7xLxDdJrDLR5iBH8eCbp4hWYVwu7U38pLmM/WOSKdsoLeJ8L/UyCdygRdE/FuWlfb5i2mTaTAhKNKyO/ogtGs/lJ6RGMzOMaaZXfyaw1BEV5SJ64wWKpqfyX7BEBZEzEx/Fh2wfI7cEhg8O3LQlrLGW7RpcitqJC94zc3iqyu/eRIZ74x+gek+RqoYzKQNoTtGPq3Hc3qVzdEZ7MgRnDBvlfRpL9lRVD/+jMB7aYQbigt9FF98q1RFtz82JaS093R7iWkjib8IfaxtBnLIkXkqLdaW4k23CRcA+29vEuMZDcZAAfb0XgOIwWrhS37E2Xtiu1kCbLyweQLlQ6wK2e4FGootOZp7YNSi2lF1GoB1CwRiNu5H+m2fvjPG74Ik6GfLVVvLjPVSh8QfPq2xbs1ovWjotvJxjHJQdAuWDtx+kQILt6yHUq0R1XkZwJVZZJY2cx1WCflXluWOW9pxXv924ujXAOJtQ4yfNHtdSvViHI7xskKOHx6DRwRTCmiw52tFO/0gJla6eHZGsYKTA7djqZSm/eXy7Lw8TawCsph0QrQLOOMTYD45OueSOH7w83IDN/WzAZHkgz6VTSKWe1PCvUJa40oF1JOy/AC+hgY2VCGb27uyGav3VzS+nYJYhhXSQuQXqmUKl/SMFFXRrXkm0nFDgXVbhABt/36vT2jUJuUpc/pWx4pu8uO57blz//VT8AjFTJZmtmcXhNaHAfICzors1Sh4mC6YdLRK65TlgDgr1qvtIWyv4Vvosg877qrLOCt+NfSY0e8DagYYL38YgetY2zav0a6KByn7ZcIDxN7f91mV9enNe1qGGc4MLodvegUDKLTX6rQfbf16gtuyxh8e8oN/WtZmM5aLkotno89uvButB0RX22Em4C0tb0acvAJgrjsfJelI/KtVeYMPdlWmco2R0WyMIYBJmSC5ahEjIryjbjBlPU7NoNRnCUSF5MH2UWS1XiJkDAHzjrsfNbG+UL5oeP/d9dLAnncxPg==" />
+    <!-- Top Banner Image -->
+     <!-- Top Banner Image -->
+    <div id="headerBanner" style="width: 100%; height: 150px; background-image: url(/PublicSite/Resources/images/header-repeat.png); border-bottom:1px solid black; font: bold small-caps normal 28px 'Times New Roman' !important; color: #000;">
+        <div id="brandingHeader" style="width:100%; height:20px; background-image:url(/PublicSite/Resources/images/branding-header-repeat.png);">
+            <img src="/PublicSite/Resources/images/branding-header.gif" alt="Official Nebraska Government Website"/>
+        </div>
+        <span style="padding:30px 20px; font-size:42px;">Nebraska Accountability and Disclosure Commission</span>
+        <div id="guardianHeaderText" style="padding: 15px 40px;">
+            <span style="font-size: 28px; letter-spacing: 1px;">FirstTuesday ®</span><br />
+            <span style="font-size: 18px;">Campaign Finance System</span>
+        </div>
+        <!--<img src="/CampaignFinance/images/Header/Quest-IS-GCR-sub-logo-vector-012015-01d-1024x253.png" alt="Nebraska Campaign Finance Application" style="width: 100%; height: 220px; display: inline-block;" />-->
+    </div>
+    <!-- Top Navigation, broken into three panels.  One for committee users, admin (BOE) users, and the public.  -->
+    <div id="ctl00_TopNav">
+	
+        <div id="ctl00_TopNav_Public">
+		
+            <div id="topNav">
+                <ul>
+                    <li><a href="/PublicSite/Homepage.aspx">Home</a></li>
+                    <li><a href="#">Search</a>
+                        <ul>
+                            
+                                <li><a href="#">Candidates/Committees/<br/>Businesses/Others</a>
+                                    <ul style="margin-left: -28px;">
+                                        <li><a href="/PublicSite/SearchPages/Search.aspx?SearchTypeCodeHook=1F26BA5E-71EA-48E4-8D50-C1013E9FE0A7">Candidates</a></li>
+                                        <li><a href="/PublicSite/SearchPages/Search.aspx?SearchTypeCodeHook=4E059E51-A3C3-45F5-A1BC-EA50C2AF9973">Committees/Businesses/Others</a></li>
+                                        <li><a href="/PublicSite/SearchPages/Search.aspx?SearchTypeCodeHook=F0FEA582-08C3-42BA-B008-0F5067C5791B">Candidate/Committee/Business/Other Contributions Search</a></li>
+                                        <li><a href="/PublicSite/SearchPages/Search.aspx?SearchTypeCodeHook=16D3B0E7-88E1-4105-AF0D-F241E7724D6B">Candidate/Committee/Business/Other Expenditures Search</a></li>
+                                        <li><a href="/PublicSite/SearchPages/PoliticalRaceSearch.aspx">Political Race</a></li>
+                                       
+                                    </ul>
+                                </li>
+                            
+                           
+                            
+                                <li><a href="/PublicSite/SearchPages/Search.aspx?SearchTypeCodeHook=9C7E5A24-7B3D-41D8-8DE2-0AB873E42933">Documents</a></li>
+                            
+                            
+                                <li><a href="/PublicSite/SearchPages/Search.aspx?SearchTypeCodeHook=86C705B4-76BE-4FD9-B9A0-B607711F8A3A">Statements of Financial<br/>Interests (C-1)</a></li>
+                            
+                        </ul>
+                    </li>
+                    <li><a href="/PublicSite/Resources.aspx">Resources</a>
+                        <ul>
+                            <li><a href="/PublicSite/Announcements.aspx">Announcements</a></li>
+                            <li><a href="/PublicSite/Publications.aspx">Publications</a></li>
+                            <li><a href="/PublicSite/Forms.aspx">Forms</a></li>
+                            <li><a href="/PublicSite/FAQ.aspx">FAQ</a></li>
+                            
+                                <li><a href="/PublicSite/DataDownload.aspx">Download Data</a></li>
+                            
+                            <li><a href="/PublicSite/Links.aspx">Links</a></li>
+                        </ul>
+                    </li>
+                    
+                        <li><a href="/PublicSite/Reports/Reports.aspx">Reports</a></li>
+                    
+                    
+                        <li><a href="/PublicSite/QuickStats.aspx">Quick Stats</a></li>
+                    
+                    <li>
+                        <a id="ctl00_lnkRegistration" href="javascript:__doPostBack(&#39;ctl00$lnkRegistration&#39;,&#39;&#39;)">Registration</a></li>
+                  
+                    <li><a href="http://nadc-e.nebraska.gov/CampaignFinance/UserLogin.aspx">Filer Login</a></li>
+                </ul>
+            </div>
+        
+	</div>
+    
+</div>
+    <!-- This divider contains:
+        1.  an AJAX Toolkit Script Manager
+        2.  a UC Header control for updating information that appears below the top nav
+        3.  Controls for managing page errors / success messages 
+        4.  a placeholder control for all page content
+        5.  a Security check control 
+        6.  the Footer-->
+    <div style="width: 100%;">
+        
+        <table cellpadding="30" cellspacing="0" style="width: 100%">
+            <tr valign="top">
+                <td colspan="2">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td colspan="2">
+                                <div id="ctl00_updatePanel1">
+	
+                                        <table width="100%">
+                                            <tr>
+                                                <td align="right">
+                                                    
+<table border="0" style="width: 100%;">
+    <div id="ctl00_ucHeaderLoginInfo_pnlHeader">
+		
+        <tr>
+            <td align="left" colspan="2">
+                <span id="ctl00_ucHeaderLoginInfo_lblHeaderTitle" class="pageTitle">Statements of Financial Interests (C-1)</span>
+            </td
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr class="hrule" />
+            </td>
+        </tr>
+    
+	</div>
+    <tr>
+        <td width="70%" align="left">
+            <table id="ctl00_ucHeaderLoginInfo_ucTick_TableTick" class="frm_Tick" cellspacing="0" cellpadding="0" width="100%">
+		<tr>
+			<td id="ctl00_ucHeaderLoginInfo_ucTick_tcTick" valign="top" height="20" nowrap="nowrap"><a id="ctl00_ucHeaderLoginInfo_ucTick_lnkTick1" title="Click here to return to the home page." class="TickMenuLink" href="javascript:__doPostBack(&#39;ctl00$ucHeaderLoginInfo$ucTick$lnkTick1&#39;,&#39;&#39;)">Home</a><span id="ctl00_ucHeaderLoginInfo_ucTick_lblTick1" class="tickMenuText"> > </span><span id="ctl00_ucHeaderLoginInfo_ucTick_lblTickLast" class="tickMenuText">Statements of Financial Interests (C-1)</span></td>
+		</tr>
+	</table>
+
+        </td>
+        <td width="30%" align="right">
+            <table id="ctl00_ucHeaderLoginInfo_tblHelp" align="Center" height="100%" width="100%">
+		<tr align="center" valign="middle">
+			<td align="left" valign="middle"><span id="ctl00_ucHeaderLoginInfo_lblTestSite" class="smFrmWarning"></span></td><td align="right" valign="middle"><a id="ctl00_ucHeaderLoginInfo_HypMenuHelp" title="Click to view Help for this page." class="smFrmLabel" href="http://nadc-e.nebraska.gov/PublicSite/FAQ.aspx" target="_new"><b><font face="Arial" color="Navy" size="1">Help with this page<img id="ctl00_ucHeaderLoginInfo_imgQuestion" src="../resources/images/icons/question-mark-green.jpg" /></font></b></a></td>
+		</tr>
+	</table>
+
+        </td>
+    </tr>
+</table>
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="masterSuccessMessages">
+                                                    <span id="ctl00_lblMasterInfo" class="lblSuccess"></span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="masterErrorMessages">
+                                                    <span id="ctl00_lblMasterError" class="frmError"></span>
+                                                    
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="masterWarningMessages">
+                                                    <span id="ctl00_lblMasterWarning" class="lblWarning"></span>
+                                                    
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15px;">
+                               
+                            </td>
+                            <td style="width: 100%;" rowspan="25">
+                                
+                                <!-- "Skip Navigation" target for screen readers-->
+                                <span id="page-body"></span>
+                                
+    <div id="ctl00_Content_pnlContent">
+	<span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a" data-cfgid><span></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_PFDSearchHeader" class=" LabelControl" data-cfgid="PFDSearchHeader"><p class='thHeading'>Financial Disclosure Search</p></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_Instructions" class=" LabelControl" data-cfgid="Instructions"><p class='lblInstructionalText'>Enter information about the Financial Disclosure Filer for which you are searching and click the Search button.</p></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch" data-cfgid="mgrPFDSearch"><span></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams" class=" GroupManager" data-cfgid="mgrSearchParams"><span></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_FilingYear" class=" DropDownListControl" data-cfgid="FilingYear"><span class="inlineLabel">Filing Year</span><select name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$FilingYear$ctl01">
+		<option value=""></option>
+		<option value="2018">2018</option>
+		<option value="2019">2019</option>
+		<option value="2020">2020</option>
+		<option value="2021">2021</option>
+		<option value="2022">2022</option>
+		<option selected="selected" value="2023">2023</option>
+		<option value="2024">2024</option>
+		<option value="2025">2025</option>
+		<option value="2026">2026</option>
+
+	</select><br /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_LastName" class=" TextControl" data-cfgid="LastName"><span class="inlineLabel">Last Name</span><input data-focus="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_btnSearch" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$LastName$ctl01" type="text" /><br /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_FiledMethod" class=" DropDownListControl" data-cfgid="FiledMethod"><span class="inlineLabel">Filed Method</span><select name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$FiledMethod$ctl01">
+		<option selected="selected" value="All">All</option>
+		<option value="Electronic">Electronic</option>
+		<option value="Manual">Manual</option>
+
+	</select><br /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_OfficeHeld" class=" TextControl" data-cfgid="OfficeHeld"><span class="inlineLabel">Office/Position Held</span><input data-focus="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_btnSearch" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$OfficeHeld$ctl01" type="text" /><br /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_OfficeSought" class=" TextControl" data-cfgid="OfficeSought"><span class="inlineLabel">Office Sought</span><input data-focus="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_btnSearch" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$OfficeSought$ctl01" type="text" /><br /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID" data-cfgid="PFD_FilingCodeID"><span class="inlineLabel">Filing Reason(s)</span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01"><input id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_0" type="checkbox" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$PFD_FilingCodeID$ctl01$0" value="6873E34F-FAF4-4B66-BDB3-ED91F75CDF69" /><label for="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_0">A candidate for elective office</label><br /><input id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_1" type="checkbox" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$PFD_FilingCodeID$ctl01$1" value="AA13F464-C83A-4D8A-914F-3F80F9F248A1" /><label for="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_1">Annual officeholder's or state employee's report</label><br /><input id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_2" type="checkbox" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$PFD_FilingCodeID$ctl01$2" value="7D62CF8C-6F62-467C-A703-460518E66B03" /><label for="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_2">Left office or position</label><br /><input id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_3" type="checkbox" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$PFD_FilingCodeID$ctl01$3" value="C6AAA0DC-E2C1-4436-8A23-21C77334F773" /><label for="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_3">Newly appointed to office or position</label><br /><input id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_4" type="checkbox" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchParams$PFD_FilingCodeID$ctl01$4" value="7A59EC23-15E7-4F6E-A79C-1B9850D4597C" /><label for="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchParams_PFD_FilingCodeID_ctl01_4">Supplemental Information</label></span><br /></span></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_btnSearch" class=" ButtonControl" data-cfgid="btnSearch"><span></span><input type="button" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$btnSearch$ctl01" value="Search" onclick="this.disabled=true;this.value=&#39;Please Wait...&#39;;__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$btnSearch$ctl01&#39;,&#39;&#39;)" class="frm_button" /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_btnReset" class=" ButtonControl" data-cfgid="btnReset"><span></span><input type="button" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$btnReset$ctl01" value="Reset" onclick="this.disabled=true;this.value=&#39;Please Wait...&#39;;__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$btnReset$ctl01&#39;,&#39;&#39;)" class="frm_button" /><br /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults" data-cfgid="mgrSearchResults"><span class='ExportControls'><span>Export To: </span><input type="image" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$ctl03" title="Click here to download the search results as a comma-delimited file" src="../images/CSV.jpg" alt="CSV" /><input type="image" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$ctl04" title="Click here to download the search results as an Excel spreadsheet" src="../images/Excel.gif" alt="Excel" /><input type="image" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$ctl05" title="Click here to download the search results as a PDF document" src="../images/pdf.jpg" alt="PDF" /><input type="image" name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$ctl06" title="Click here to print the contents of the search results" src="../images/print_icon_3.gif" alt="Print" /></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer" data-cfgid="mgrReportViewer"><span></span><span id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD" class=" GridControl" data-cfgid="grdPFD"><span></span><div>
+		<table class="frmDataGrid" cellspacing="0" rules="all" border="1">
+			<tr>
+				<th scope="col" abbr="LastName"><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Sort$FirstName&#39;)">Filer</a></th><th scope="col" abbr="FilingYear"><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Sort$FilingYear&#39;)">Year</a></th><th scope="col" abbr="FilingReason"><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Sort$FilingReason&#39;)">Filing Reason(s)</a></th><th scope="col" abbr="OfficeHeld"><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Sort$OfficeHeld&#39;)">Office/Position Held</a></th><th scope="col" abbr="OfficeSought"><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Sort$OfficeSought&#39;)">Office Sought</a></th><th scope="col" abbr="FiledDate"><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Sort$FiledDate&#39;)">Date Filed</a></th><th scope="col" abbr="colActions">&nbsp;</th>
+			</tr><tr>
+				<td>JON ABEGGLEN </td><td>2023</td><td>Newly appointed to office or position</td><td>MEMBER</td><td></td><td>1/24/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl02_colActions_sub_actView00" href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01$ctl02$colActions_sub_actView00&#39;,&#39;&#39;)">View</a></td>
+			</tr><tr>
+				<td>CHRISTY LEE ABTS </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>DAKOTA - COUNTY ASSESSOR</td><td></td><td>1/29/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl03_colActions_sub_actView00" href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01$ctl03$colActions_sub_actView00&#39;,&#39;&#39;)">View</a></td>
+			</tr><tr>
+				<td>JENIFER ACIERNO </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>AGENCY LEGAL COUNSEL</td><td></td><td>2/26/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl04_colActions_sub_actView00" href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01$ctl04$colActions_sub_actView00&#39;,&#39;&#39;)">View</a></td>
+			</tr><tr>
+				<td>KELLI M ACKERMAN </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>BOARD MEMBER</td><td></td><td>2/28/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl05_colActions_sub_actManualView01" href="javascript:Configurable.handlePopup(&#39;../Reporting/DocumentImagePopup.aspx?PFD_FilingID=a4f60783-2968-4734-93e1-2419010c0a9f&#39;)">View</a></td>
+			</tr><tr>
+				<td>THOMAS F ACKLEY </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>PLANNING COMMISSION</td><td></td><td>5/21/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl06_colActions_sub_actManualView01" href="javascript:Configurable.handlePopup(&#39;../Reporting/DocumentImagePopup.aspx?PFD_FilingID=aaf0ba9f-3ebb-4a16-a753-d0c9c26ec3fb&#39;)">View</a></td>
+			</tr><tr>
+				<td>REX A ADAMS </td><td>2023</td><td>A candidate for elective office</td><td>GAGE - COUNTY SUPERVISOR</td><td></td><td>2/20/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl07_colActions_sub_actManualView01" href="javascript:Configurable.handlePopup(&#39;../Reporting/DocumentImagePopup.aspx?PFD_FilingID=71393121-fa34-4cc1-b0c1-4e34fa5199de&#39;)">View</a></td>
+			</tr><tr>
+				<td>ALICIA MARIE ADAMS </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>DEUEL - COUNTY TREASURER</td><td></td><td>2/14/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl08_colActions_sub_actView00" href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01$ctl08$colActions_sub_actView00&#39;,&#39;&#39;)">View</a></td>
+			</tr><tr>
+				<td>KAREY LYNN ADAMY </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>BUTLER - COUNTY TREASURER</td><td></td><td>1/4/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl09_colActions_sub_actView00" href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01$ctl09$colActions_sub_actView00&#39;,&#39;&#39;)">View</a></td>
+			</tr><tr>
+				<td>RICHARD A AERNI </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>LOUP RIVER PUBLIC POWER DISTRICT - BOARD OF DIRECTORS</td><td></td><td>2/8/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl10_colActions_sub_actManualView01" href="javascript:Configurable.handlePopup(&#39;../Reporting/DocumentImagePopup.aspx?PFD_FilingID=45b456b0-60aa-4e4f-8bd9-9d1ace264662&#39;)">View</a></td>
+			</tr><tr>
+				<td>LESLIE L AGENA </td><td>2023</td><td>Annual officeholder's or state employee's report</td><td>JOHNSON - COUNTY COMMISSIONER</td><td></td><td>2/16/2024</td><td><a id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl11_colActions_sub_actManualView01" href="javascript:Configurable.handlePopup(&#39;../Reporting/DocumentImagePopup.aspx?PFD_FilingID=4502438d-7e65-4e6a-85fd-28f8d47b1dc3&#39;)">View</a></td>
+			</tr><tr>
+				<td colspan="7"><table style="display:inline-block;">
+					<tr>
+						<td><span>1</span></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$2&#39;)">2</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$3&#39;)">3</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$4&#39;)">4</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$5&#39;)">5</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$6&#39;)">6</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$7&#39;)">7</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$8&#39;)">8</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$9&#39;)">9</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$10&#39;)">10</a></td><td><a href="javascript:__doPostBack(&#39;ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01&#39;,&#39;Page$11&#39;)">...</a></td>
+					</tr>
+				</table><table style="display:inline-block;float:right;">
+					<tr>
+						<td>Page Size:<select name="ctl00$Content$86c705b4-76be-4fd9-b9a0-b607711f8a3a$mgrPFDSearch$mgrSearchResults$mgrReportViewer$grdPFD$ctl01$ctl13$grdPFDPageSizeDropDown" id="ctl00_Content_86c705b4-76be-4fd9-b9a0-b607711f8a3a_mgrPFDSearch_mgrSearchResults_mgrReportViewer_grdPFD_ctl01_ctl13_grdPFDPageSizeDropDown">
+							<option selected="selected" value="10">10</option>
+							<option value="25">25</option>
+							<option value="50">50</option>
+
+						</select></td>
+					</tr>
+				</table></td>
+			</tr>
+		</table>
+	</div></span></span></span></span><br /></span>
+</div>
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <div id="ctl00_updateProgress1" style="display:block;">
+	
+                            <div class="UpdatePanelProgressBackground">
+                            </div>
+                            <div class="UpdatePanelProgress">
+                                <img id="ctl00_LoadingImage" src="/PublicSite/Resources/images/loading.gif" alt="Loading" />
+                            </div>
+                        
+</div>
+                </td>
+            </tr>
+        </table>
+        <div id="footer" style="width: 100%; background-color:#C9BA93; padding-top:20px; border-top:1px solid black;">
+            <!--<div id="footerBanner" style="width: 100%;">
+            </div>-->
+            <center>
+                <a href="http://www.nebraska.gov" target="_blank">State of Nebraska</a>
+                <a href="http://www.nadc.nebraska.gov" target="_blank">Nebraska Accountability and Disclosure Commission</a>
+                <a href="https://gocivix.com/ethics-administration/campaign-finance/" target="_blank">About FirstTuesday® Campaign Finance</a><br />
+                Copyright 2015. All rights reserved.
+            </center>
+            <br />
+        </div>
+        <div style="width: 100%;">
+        </div>
+        <!--- Bottom contact info and menu --->
+    </div>
+    </form>
+</body>
+</html>
