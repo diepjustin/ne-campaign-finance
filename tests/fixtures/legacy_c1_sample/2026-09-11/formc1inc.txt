@@ -1,0 +1,4 @@
+Candidate First Name|Candidate Last Name|Candidate ID|Date Received|Income Source Name|Income Source Address|Income Reason|Type of Inocome
+JANE|SAMPLE|99FIS00001|03/13/2000|ACME CORP|123 ELM ST OMAHA NE||I
+JANE|SAMPLE|99FIS00001|03/13/2000|FIRST BANK|OMAHA NE||F
+JANE|SAMPLE|99FIS00001|03/13/2000|MYSTERY CODE INC|OMAHA NE||Z
