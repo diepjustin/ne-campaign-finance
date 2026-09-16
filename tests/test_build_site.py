@@ -107,6 +107,60 @@ def test_modern_rows_are_tagged_era_modern(tmp_path, monkeypatch):
     assert rows_by_contributor["JANE DOE"][0][-1] == "modern"
 
 
+EXPENDITURE_HEADER = (
+    "expenditure_id,org_id,filer_type,filer_name,candidate_name,transaction_type,"
+    "sub_type,expenditure_date,amount,description,payee_type,payee_last_name,"
+    "payee_first_name,payee_middle_name,payee_suffix,address_1,address_2,city,"
+    "state,zip,filed_date,support_or_oppose,target_name,target_jurisdiction,"
+    "amended,employer,occupation,principal_place_of_business,payee_name,"
+    "rows_sharing_id,include_in_total,source_year,source_snapshot\n"
+)
+
+
+def _write_expenditures(tmp_path, *rows):
+    path = tmp_path / "expenditures.csv"
+    path.write_text(EXPENDITURE_HEADER + "".join(rows), encoding="utf-8")
+    return path
+
+
+def test_expenditures_grouped_by_filer_name_and_tagged_modern(tmp_path, monkeypatch):
+    row = (
+        "1,100,PAC,Example PAC,,Monetary,,2025-03-01,1200.0,Yard signs,"
+        "Business (For-Profit and Non-Profit entities),,,,,1 ST,,LINCOLN,NE,"
+        "68508,2025-04-01,,,,N,,,,Sign Shop LLC,1,True,2025,s.csv\n"
+    )
+    monkeypatch.setattr(build_site, "EXPENDITURES", _write_expenditures(tmp_path, row))
+
+    index = build_site.build_expenditures_index()
+
+    txn = index["Example PAC"][0]
+    assert txn[1] == 1200.0        # amount
+    assert txn[2] == "Sign Shop LLC"  # payee_name
+    assert txn[-1] == "modern"     # era
+
+
+def test_independent_expenditures_csv_never_read(tmp_path, monkeypatch):
+    """PLAN.md's own table: independent_expenditures.csv is 'a subset of
+    expenditures, not extra rows' -- reading it too would double-count."""
+    assert not hasattr(build_site, "INDEPENDENT_EXPENDITURES")
+
+
+def test_legacy_expenditures_tagged_pre2022(tmp_path, monkeypatch):
+    legacy_header = EXPENDITURE_HEADER.strip("\n") + ",era,source_form\n"
+    legacy_row = (
+        "9,200,PAC,Old Committee,,Monetary,,2018-05-01,300.0,Mailers,"
+        "Business (For-Profit and Non-Profit entities),,,,,9 ST,,LINCOLN,NE,"
+        "68508,2018-06-01,,,,N,,,,Print Shop,9,True,2018,s.csv,pre2022,formb1d\n"
+    )
+    legacy_path = tmp_path / "expenditures_legacy.csv"
+    legacy_path.write_text(legacy_header + legacy_row, encoding="utf-8")
+    monkeypatch.setattr(build_site, "LEGACY_EXPENDITURES", legacy_path)
+
+    index = build_site.build_expenditures_index()
+
+    assert index["Old Committee"][0][-1] == "pre2022"
+
+
 def test_legacy_rows_join_the_same_detail_list_tagged_pre2022(tmp_path, monkeypatch):
     """The whole point of ne-connect's ask: one name's transaction list spans
     both eras, even though their dollar totals are never summed (see

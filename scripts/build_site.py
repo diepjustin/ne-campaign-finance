@@ -44,9 +44,16 @@ CONTRIBUTIONS = ROOT / "data" / "processed" / "contributions.csv"
 # are never summed into one figure" rule applies here exactly as it does on
 # ne-connect's own page.
 LEGACY_CONTRIBUTIONS = ROOT / "data" / "processed" / "contributions_legacy.csv"
+# Campaign spending -- money a filer paid out, not received. Independent
+# expenditures.csv is deliberately NOT read here too: PLAN.md's own table
+# notes it is "a subset of expenditures, not extra rows," so reading it
+# alongside expenditures.csv would double-count those rows.
+EXPENDITURES = ROOT / "data" / "processed" / "expenditures.csv"
+LEGACY_EXPENDITURES = ROOT / "data" / "processed" / "expenditures_legacy.csv"
 META = ROOT / "data" / "scrape_meta.json"
 OUT = ROOT / "index.html"
 ROWS_OUT = ROOT / "d" / "rows.json"
+EXPENDITURES_OUT = ROOT / "d" / "expenditures.json"
 
 # csv defaults to 128 KB; some description fields run long.
 csv.field_size_limit(sys.maxsize)
@@ -236,6 +243,45 @@ def build_search_index():
     return contributors, filers, dict(rows_by_contributor)
 
 
+def build_expenditures_index():
+    """filer_name -> every itemized expenditure, for ne-connect's fetch.
+
+    The spending side of build_search_index(): that function reads what a
+    filer RECEIVED (contributions.csv), this reads what a filer PAID OUT
+    (expenditures.csv). Same era-merge shape as _append_legacy_rows() --
+    modern and pre-2022 rows share one list, tagged, never summed.
+    Row shape: [date, amount, payee_name, description, city, state,
+    support_or_oppose, included, era].
+    """
+    by_filer = defaultdict(list)
+
+    def _read(path, era):
+        if not path.exists():
+            return
+        with path.open(encoding="utf-8", newline="") as fh:
+            for row in csv.DictReader(fh):
+                filer_name = (row.get("filer_name") or "").strip()
+                if not filer_name:
+                    continue
+                by_filer[filer_name].append(
+                    [
+                        row.get("expenditure_date", ""),
+                        round(_money(row.get("amount")), 2),
+                        (row.get("payee_name") or "").strip(),
+                        (row.get("description") or "").strip(),
+                        (row.get("city") or "").strip(),
+                        (row.get("state") or "").strip(),
+                        (row.get("support_or_oppose") or "").strip(),
+                        row.get("include_in_total") == "True",
+                        era,
+                    ]
+                )
+
+    _read(EXPENDITURES, "modern")
+    _read(LEGACY_EXPENDITURES, "pre2022")
+    return dict(by_filer)
+
+
 def main() -> int:
     if not SUMMARY.exists():
         print("no data/processed/summary.json -- run scripts/normalize.py first")
@@ -264,6 +310,10 @@ def main() -> int:
     ROWS_OUT.parent.mkdir(parents=True, exist_ok=True)
     rows_payload = json.dumps(rows_by_contributor, separators=(",", ":"))
     ROWS_OUT.write_text(rows_payload, encoding="utf-8")
+
+    expenditures_index = build_expenditures_index()
+    expenditures_payload = json.dumps(expenditures_index, separators=(",", ":"))
+    EXPENDITURES_OUT.write_text(expenditures_payload, encoding="utf-8")
 
     contributors_json = json.dumps(contributors, separators=(",", ":"))
     filers_json = json.dumps(filers, separators=(",", ":"))
@@ -486,6 +536,8 @@ if (initial) {{
     print(f"  contributors  {len(contributors):>8,}")
     print(f"  filers        {len(filers):>8,}")
     print(f"  d/rows.json   {len(rows_payload) / 1024:>8,.0f} KB")
+    print(f"  d/expenditures.json  {len(expenditures_index):>6,} filers"
+          f"  ({len(expenditures_payload) / 1024:.0f} KB)")
     print(f"  -> {OUT.name} ({len(html) / 1024:.0f} KB)")
     return 0
 
