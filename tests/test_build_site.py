@@ -161,6 +161,54 @@ def test_legacy_expenditures_tagged_pre2022(tmp_path, monkeypatch):
     assert index["Old Committee"][0][-1] == "pre2022"
 
 
+FINANCIAL_INTERESTS_HEADER = (
+    "disclosure_id,item_type,counterparty_name_raw,detail,source_url,retrieved_at,ocr\n"
+)
+
+
+def test_disclosure_items_grouped_by_disclosure_id(tmp_path, monkeypatch):
+    row = (
+        "abc-123,income_source,Some Employer,,https://example.gov/abc-123,"
+        "2026-09-15,False\n"
+    )
+    path = tmp_path / "financial_interests.csv"
+    path.write_text(FINANCIAL_INTERESTS_HEADER + row, encoding="utf-8")
+    monkeypatch.setattr(build_site, "FINANCIAL_INTERESTS", path)
+
+    index = build_site.build_disclosure_items_index()
+
+    item = index["abc-123"][0]
+    assert item == ["income_source", "Some Employer", "", False, "modern"]
+
+
+def test_disclosure_item_ocr_flag_passed_through(tmp_path, monkeypatch):
+    row = (
+        "abc-123,real_property,personal residence need not be reported.,,"
+        "https://example.gov/abc-123,2026-09-15,True\n"
+    )
+    path = tmp_path / "financial_interests.csv"
+    path.write_text(FINANCIAL_INTERESTS_HEADER + row, encoding="utf-8")
+    monkeypatch.setattr(build_site, "FINANCIAL_INTERESTS", path)
+
+    index = build_site.build_disclosure_items_index()
+
+    assert index["abc-123"][0][3] is True
+
+
+def test_legacy_disclosure_items_tagged_pre2022(tmp_path, monkeypatch):
+    legacy_row = (
+        "xyz-789,business_association,Some Firm,,https://example.gov/xyz-789,"
+        "2026-09-15,False\n"
+    )
+    path = tmp_path / "financial_interests_legacy.csv"
+    path.write_text(FINANCIAL_INTERESTS_HEADER + legacy_row, encoding="utf-8")
+    monkeypatch.setattr(build_site, "LEGACY_FINANCIAL_INTERESTS", path)
+
+    index = build_site.build_disclosure_items_index()
+
+    assert index["xyz-789"][0][-1] == "pre2022"
+
+
 def test_legacy_rows_join_the_same_detail_list_tagged_pre2022(tmp_path, monkeypatch):
     """The whole point of ne-connect's ask: one name's transaction list spans
     both eras, even though their dollar totals are never summed (see

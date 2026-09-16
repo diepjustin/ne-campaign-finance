@@ -26,6 +26,9 @@ def _no_real_legacy_csv(monkeypatch, tmp_path):
         import build_site
     except ImportError:
         return
-    for attr in ("LEGACY_CONTRIBUTIONS", "EXPENDITURES", "LEGACY_EXPENDITURES"):
+    for attr in (
+        "LEGACY_CONTRIBUTIONS", "EXPENDITURES", "LEGACY_EXPENDITURES",
+        "LEGACY_FINANCIAL_INTERESTS",
+    ):
         if hasattr(build_site, attr):
             monkeypatch.setattr(build_site, attr, tmp_path / f"no-such-{attr.lower()}.csv")

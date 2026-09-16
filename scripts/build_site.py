@@ -54,6 +54,13 @@ META = ROOT / "data" / "scrape_meta.json"
 OUT = ROOT / "index.html"
 ROWS_OUT = ROOT / "d" / "rows.json"
 EXPENDITURES_OUT = ROOT / "d" / "expenditures.json"
+# C-1/C-2 financial-interest items -- a different pipeline (scrape_c1.py /
+# build_financial_interests.py / normalize_legacy_c1.py) than contributions/
+# expenditures, but the same repo, so its lazy export lives here too rather
+# than in a third build script.
+FINANCIAL_INTERESTS = ROOT / "data" / "processed" / "financial_interests.csv"
+LEGACY_FINANCIAL_INTERESTS = ROOT / "data" / "processed" / "financial_interests_legacy.csv"
+DISCLOSURE_ITEMS_OUT = ROOT / "d" / "disclosure_items.json"
 
 # csv defaults to 128 KB; some description fields run long.
 csv.field_size_limit(sys.maxsize)
@@ -282,6 +289,53 @@ def build_expenditures_index():
     return dict(by_filer)
 
 
+def build_disclosure_items_index():
+    """disclosure_id -> every financial-interest item on that filing, for
+    ne-connect's fetch.
+
+    Unlike contributors/filers, this join needs no alias-guessing: a
+    disclosure_id is the state's own filing id (a GUID for Manual filings, a
+    deterministic hash for Electronic ones -- see scrape_c1.py), already the
+    exact source_id ne-connect's load_disclosure_filers() keys its Party
+    objects by.
+
+    Real data-quality caveat, unchanged by this export (see docs/SCHEMA.md
+    and ingest/sources.py's load_disclosure_filers() docstring in
+    ne-connect): several item types (real_property, other_financial_interest,
+    gift) use a line-fallback parser that can pick up the form's own
+    instructional boilerplate as if it were the filer's actual answer on a
+    mostly-blank filing. This export carries the state's text verbatim
+    either way (CLAUDE.md rule 1) and passes `ocr` through unchanged so a
+    reader never treats a scanned, OCR'd row at the same confidence as a
+    clean text-layer or legacy one.
+
+    Row shape: [item_type, counterparty_name_raw, detail, ocr, era].
+    """
+    by_disclosure = defaultdict(list)
+
+    def _read(path, era):
+        if not path.exists():
+            return
+        with path.open(encoding="utf-8", newline="") as fh:
+            for row in csv.DictReader(fh):
+                disclosure_id = (row.get("disclosure_id") or "").strip()
+                if not disclosure_id:
+                    continue
+                by_disclosure[disclosure_id].append(
+                    [
+                        (row.get("item_type") or "").strip(),
+                        (row.get("counterparty_name_raw") or "").strip(),
+                        (row.get("detail") or "").strip(),
+                        row.get("ocr") == "True",
+                        era,
+                    ]
+                )
+
+    _read(FINANCIAL_INTERESTS, "modern")
+    _read(LEGACY_FINANCIAL_INTERESTS, "pre2022")
+    return dict(by_disclosure)
+
+
 def main() -> int:
     if not SUMMARY.exists():
         print("no data/processed/summary.json -- run scripts/normalize.py first")
@@ -314,6 +368,10 @@ def main() -> int:
     expenditures_index = build_expenditures_index()
     expenditures_payload = json.dumps(expenditures_index, separators=(",", ":"))
     EXPENDITURES_OUT.write_text(expenditures_payload, encoding="utf-8")
+
+    disclosure_items_index = build_disclosure_items_index()
+    disclosure_items_payload = json.dumps(disclosure_items_index, separators=(",", ":"))
+    DISCLOSURE_ITEMS_OUT.write_text(disclosure_items_payload, encoding="utf-8")
 
     contributors_json = json.dumps(contributors, separators=(",", ":"))
     filers_json = json.dumps(filers, separators=(",", ":"))
@@ -538,6 +596,8 @@ if (initial) {{
     print(f"  d/rows.json   {len(rows_payload) / 1024:>8,.0f} KB")
     print(f"  d/expenditures.json  {len(expenditures_index):>6,} filers"
           f"  ({len(expenditures_payload) / 1024:.0f} KB)")
+    print(f"  d/disclosure_items.json  {len(disclosure_items_index):>6,} filings"
+          f"  ({len(disclosure_items_payload) / 1024:.0f} KB)")
     print(f"  -> {OUT.name} ({len(html) / 1024:.0f} KB)")
     return 0
 
