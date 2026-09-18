@@ -12,7 +12,7 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: read
+  contents: write  # for `gh release create` below (data-release publish for ne-connect)
   actions: write   # for `gh cache delete` cleanup
 
 concurrency:
@@ -135,3 +135,39 @@ jobs:
           gh cache list --key ne-campaign-finance-data- --json id,createdAt --limit 100 \
             | jq -r 'sort_by(.createdAt) | reverse | .[3:] | .[].id' \
             | xargs -r -n1 gh cache delete
+
+      # ne-connect (the hub) can't read this repo's gitignored data/processed/
+      # directly, and Actions caches are strictly repo-scoped -- a release is
+      # the one thing that crosses that boundary (ne-lobbying's own monthly
+      # backup already does this, PLAN.md 0.5). ne-connect-nightly.yml
+      # downloads the latest ne-campaign-finance-data-* release. Warn rather
+      # than fail: a missed release here should never take down a download
+      # that already succeeded at its real job.
+      - name: Publish a data release for ne-connect
+        if: always() && steps.cachecheck.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p release
+          for f in data/processed/*.csv; do
+            [ -f "$f" ] && gzip -c "$f" > "release/$(basename "$f").gz"
+          done
+          if ls release/*.gz >/dev/null 2>&1; then
+            tag="ne-campaign-finance-data-$(TZ=America/Chicago date +%Y-%m-%d)"
+            gh release create "$tag" release/*.gz \
+              --repo diepjustin/ne-campaign-finance \
+              --title "Campaign finance hub data — $(TZ=America/Chicago date +%Y-%m-%d)" \
+              --notes "Automated data export for ne-connect-nightly.yml. See ne-connect's PLAN.md." \
+              || echo "::warning::gh release create failed -- ne-connect will build from its previous release tonight"
+          else
+            echo "::warning::nothing to release -- skipping"
+          fi
+
+      - name: Delete old hub-data releases (keep newest 3)
+        if: always() && steps.cachecheck.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --repo diepjustin/ne-campaign-finance --json tagName,createdAt --limit 100 \
+            | jq -r '[.[] | select(.tagName | startswith("ne-campaign-finance-data-"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName' \
+            | xargs -r -n1 -I{} gh release delete {} --repo diepjustin/ne-campaign-finance --yes
