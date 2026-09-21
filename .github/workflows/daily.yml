@@ -9,7 +9,12 @@ on:
     # that made gating on the fired cron entry (not the wall clock) the rule.
     - cron: '0 9 * * *'   # 4am Central during CDT (UTC-5, 09:00 UTC)
     - cron: '0 10 * * *'  # 4am Central during CST (UTC-6, 10:00 UTC)
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      c1:
+        description: 'Also refresh the C-1/C-2 disclosure index (normally Sundays only)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write  # for `gh release create` below (data-release publish for ne-connect)
@@ -22,14 +27,19 @@ concurrency:
 jobs:
   daily:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # A plain nightly is minutes. The Sunday C-1 refresh (below) is ~20 min
+    # warm; its one-time cold start -- every filing year since 2018 with an
+    # empty page cache -- measured at ~10 min per year, so ~90. The ceiling
+    # covers that once; it costs nothing on the nights that finish in five.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
 
-      - name: Pick the DST-correct cron entry
+      - name: Pick the DST-correct cron entry, and whether today refreshes C-1
         id: gate
         env:
           SCHEDULE: ${{ github.event.schedule }}
+          C1: ${{ github.event.inputs.c1 }}
         run: |
           offset=$(TZ=America/Chicago date +%z)
           case "$offset" in
@@ -46,8 +56,17 @@ jobs:
             proceed=false
             echo "Central offset is $offset, so today's real run is cron '$want'; this run came from '$SCHEDULE'. Skipping."
           fi
+          # Sundays (or a dispatch that asks for it): refresh the C-1/C-2
+          # disclosure index. Weekly, not nightly, on purpose -- see the
+          # step itself for the numbers.
+          weekly=false
+          if [ "$(TZ=America/Chicago date +%u)" = '7' ] || [ "$C1" = 'true' ]; then
+            weekly=true
+          fi
+
           echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
-          echo "Central offset $offset -> proceed=$proceed"
+          echo "weekly=$weekly" >> "$GITHUB_OUTPUT"
+          echo "Central offset $offset -> proceed=$proceed weekly=$weekly"
 
       - uses: actions/setup-python@v6
         if: steps.gate.outputs.proceed == 'true'
@@ -102,11 +121,21 @@ jobs:
         if: steps.gate.outputs.proceed == 'true'
         run: python3 scripts/build_site.py
 
-      # scrape_c1.py is deliberately NOT run here yet. It has no --new-only /
-      # incremental mode -- every run today re-sweeps the search grid from
-      # scratch, and a live financial-disclosure site is not something to
-      # put on an unbounded nightly cron without that dedup logic designed
-      # and the cadence decided first. See PLAN.md 1.6.
+      # C-1/C-2 statements of financial interest (ne-connect PLAN.md 1.6).
+      # --new-only re-sweeps only the two newest filing years -- a year's
+      # filings keep arriving into the next January-March -- and serves
+      # every older year from the page cache under data/raw/, which the
+      # data/ cache above carries between runs. Measured 2026-09-20 at 50
+      # rows per page: 3,006 filings / 64 requests / 10 min for one year, so
+      # ~20 min a week for two. Sundays rather than nightly because
+      # disclosures arrive in bursts around filing deadlines, a week's lag
+      # is fine for an index, and it is 7x fewer requests against a live
+      # state site. A rate-limit stop mid-sweep writes the years it finished
+      # and resumes from the cache next time; the release step below picks
+      # up whatever data/processed/c1_filings.csv holds.
+      - name: Refresh the C-1/C-2 disclosure index (Sundays)
+        if: steps.gate.outputs.proceed == 'true' && steps.gate.outputs.weekly == 'true'
+        run: python3 scripts/scrape_c1.py --new-only
 
       - name: Check data/ is worth caching
         id: cachecheck
