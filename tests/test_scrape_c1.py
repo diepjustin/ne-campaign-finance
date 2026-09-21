@@ -115,6 +115,7 @@ class FakeFetcher:
         self.pages = list(pages)
         self.calls = 0
         self.requests_made = 0
+        self.posts = []
 
     def get(self, url):
         self.calls += 1
@@ -124,7 +125,12 @@ class FakeFetcher:
     def post(self, url, data):
         self.calls += 1
         self.requests_made += 1
+        self.posts.append(data)
         return self.pages.pop(0)
+
+
+# The fixture with its data rows removed: what an empty search returns.
+EMPTY_HTML = __import__("re").sub(r"<tr[^>]*>.*?</tr>", "", SAMPLE_HTML, flags=__import__("re").S)
 
 
 def test_scrape_year_stops_when_a_page_returns_no_rows(tmp_path):
@@ -132,16 +138,106 @@ def test_scrape_year_stops_when_a_page_returns_no_rows(tmp_path):
     try to page past what the live pager reports. Real pagination beyond the
     fixture is exercised implicitly by the max_page_number test above -- this
     test only checks the loop terminates on the fixture's own reported ceiling
-    without ever calling `.post` more times than the fetcher was given pages."""
-    fetcher = FakeFetcher([SAMPLE_HTML, SAMPLE_HTML])
+    without ever calling `.post` more times than the fetcher was given pages
+    (GET form, POST search, POST page-size)."""
+    fetcher = FakeFetcher([SAMPLE_HTML, SAMPLE_HTML, SAMPLE_HTML])
     cache = sc.PageCache(cache_dir=tmp_path)
     rows = sc.scrape_year(fetcher, 2023, "All", cache=cache, refresh=True, max_pages=1)
     assert len(rows) == 10
+    assert fetcher.calls == 3
 
 
-def test_page_cache_round_trips(tmp_path):
+def test_scrape_year_switches_the_grid_to_fifty_rows_right_after_the_search(tmp_path):
+    fetcher = FakeFetcher([SAMPLE_HTML, SAMPLE_HTML, SAMPLE_HTML])
+    sc.scrape_year(fetcher, 2023, "All", cache=sc.PageCache(cache_dir=tmp_path),
+                   refresh=True, max_pages=1)
+    search_post, resize_post = fetcher.posts
+    assert search_post["__EVENTTARGET"] == sc.SEARCH_BUTTON
+    assert sc.PAGE_SIZE_DROPDOWN not in search_post
+    assert resize_post["__EVENTTARGET"] == sc.PAGE_SIZE_DROPDOWN
+    assert resize_post[sc.PAGE_SIZE_DROPDOWN] == str(sc.PAGE_SIZE)
+
+
+def test_scrape_year_skips_the_resize_postback_when_the_search_is_empty(tmp_path):
+    assert sc.parse_rows(EMPTY_HTML) == []
+    fetcher = FakeFetcher([SAMPLE_HTML, EMPTY_HTML])
+    rows = sc.scrape_year(fetcher, 2026, "All", cache=sc.PageCache(cache_dir=tmp_path), refresh=True)
+    assert rows == []
+    assert fetcher.calls == 2
+
+
+def test_scrape_year_reuses_live_state_instead_of_searching_twice(tmp_path):
+    """A live page-1 fetch already holds the postback state; paging on must
+    not redo the GET+search (two wasted requests per year, the old behavior).
+    Pages: GET, search, resize, then Page$2 -- exactly four."""
+    fetcher = FakeFetcher([SAMPLE_HTML, SAMPLE_HTML, SAMPLE_HTML, EMPTY_HTML])
+    rows = sc.scrape_year(fetcher, 2023, "All", cache=sc.PageCache(cache_dir=tmp_path),
+                          refresh=True, max_pages=2)
+    assert len(rows) == 10
+    assert fetcher.calls == 4
+    assert fetcher.posts[-1]["__EVENTARGUMENT"] == "Page$2"
+    assert fetcher.posts[-1][sc.PAGE_SIZE_DROPDOWN] == str(sc.PAGE_SIZE)
+
+
+def test_page_cache_round_trips_and_stamps_the_fetch_date(tmp_path):
     cache = sc.PageCache(cache_dir=tmp_path)
     assert cache.get(2023, "All", 1) is None
     rows = [{"filer_name_raw": "TEST"}]
-    cache.put(2023, "All", 1, rows)
-    assert cache.get(2023, "All", 1) == rows
+    cache.put(2023, "All", 1, rows, retrieved_at="2026-09-15")
+    assert cache.get(2023, "All", 1) == [{"filer_name_raw": "TEST", "retrieved_at": "2026-09-15"}]
+
+
+def test_page_cache_key_includes_the_page_size_so_old_ten_row_files_are_never_misread(tmp_path):
+    import json
+    (tmp_path / "2019-All-p1.json").write_text(json.dumps([{"filer_name_raw": "OLD"}]), encoding="utf-8")
+    cache = sc.PageCache(cache_dir=tmp_path)
+    assert cache.get(2019, "All", 1) is None
+    cache.put(2019, "All", 1, [{"filer_name_raw": "NEW"}], retrieved_at="2026-09-21")
+    assert (tmp_path / f"2019-All-s{sc.PAGE_SIZE}-p1.json").exists()
+
+
+def test_build_post_data_adds_the_page_size_dropdown_only_when_asked():
+    hidden = sc.extract_hidden(SAMPLE_HTML)
+    without = sc.build_post_data(hidden, {"year": 2023, "filed_method": "All"}, sc.SEARCH_BUTTON)
+    assert sc.PAGE_SIZE_DROPDOWN not in without
+    with_size = sc.build_post_data(hidden, {"year": 2023, "filed_method": "All"},
+                                   sc.PAGE_SIZE_DROPDOWN, page_size=sc.PAGE_SIZE)
+    assert with_size[sc.PAGE_SIZE_DROPDOWN] == str(sc.PAGE_SIZE)
+    assert with_size["__EVENTTARGET"] == sc.PAGE_SIZE_DROPDOWN
+
+
+def test_rows_to_filings_keeps_each_cached_rows_own_retrieval_date():
+    """A 2018 page fetched months ago must not claim today's date on the hub."""
+    rows = sc.parse_rows(SAMPLE_HTML)
+    stamped = sc._stamped(rows[:1], "2026-03-04") + rows[1:2]
+    filings = sc.rows_to_filings(stamped, "2026-09-21")
+    assert filings[0]["retrieved_at"] == "2026-03-04"
+    assert filings[1]["retrieved_at"] == "2026-09-21"
+
+
+def test_new_only_refreshes_only_the_two_newest_years(tmp_path, monkeypatch):
+    from datetime import date
+    seen = []
+
+    def fake_scrape_year(fetcher, year, filed_method, cache, refresh=False, max_pages=None):
+        seen.append((year, refresh))
+        return []
+
+    real_cache = sc.PageCache
+    monkeypatch.setattr(sc, "scrape_year", fake_scrape_year)
+    monkeypatch.setattr(sc, "PageCache", lambda: real_cache(cache_dir=tmp_path))
+    this_year = date.today().year
+    years = [this_year - 3, this_year - 2, this_year - 1, this_year]
+    sc.main(["--new-only", "--years", *map(str, years), "--out", str(tmp_path / "out.csv")])
+    assert seen == [(this_year - 3, False), (this_year - 2, False),
+                    (this_year - 1, True), (this_year, True)]
+
+
+def test_without_new_only_or_refresh_every_year_is_a_cache_hit(tmp_path, monkeypatch):
+    seen = []
+    real_cache = sc.PageCache
+    monkeypatch.setattr(sc, "scrape_year",
+                        lambda f, y, m, c, refresh=False, max_pages=None: seen.append(refresh) or [])
+    monkeypatch.setattr(sc, "PageCache", lambda: real_cache(cache_dir=tmp_path))
+    sc.main(["--years", "2024", "2025", "--out", str(tmp_path / "out.csv")])
+    assert seen == [False, False]

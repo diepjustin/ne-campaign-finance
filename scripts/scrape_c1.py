@@ -86,6 +86,14 @@ PREFIX = f"ctl00$Content${SEARCH_TYPE_HOOK.lower()}$mgrPFDSearch"
 GRID_CONTROL = f"{PREFIX}$mgrSearchResults$mgrReportViewer$grdPFD$ctl01"
 SEARCH_BUTTON = f"{PREFIX}$btnSearch$ctl01"
 
+# The results grid's page-size dropdown offers 10/25/50 (confirmed live
+# 2026-09-20). A postback costs ~11s of server time whether it returns 10
+# rows or 50, so sweeping a year at 50 is 5x fewer requests and 5x less
+# wall-clock than the default 10, for one extra postback per year to set
+# it. Fewer requests is also just politer to the state's server (rule 6).
+PAGE_SIZE = 50
+PAGE_SIZE_DROPDOWN = f"{GRID_CONTROL}$ctl13$grdPFDPageSizeDropDown"
+
 USER_AGENT = (
     "ne-campaign-finance-scraper/0.1 "
     "(https://github.com/diepjustin/diepjustin.github.io; contact: sdiepxj367@gmail.com)"
@@ -210,11 +218,16 @@ def extract_hidden(page: str) -> dict:
 
 
 def build_post_data(hidden: dict, search_params: dict, event_target: str,
-                     event_argument: str = "") -> dict:
+                     event_argument: str = "", page_size: int = None) -> dict:
     """A full ASP.NET form submission: the real form always resubmits every
     field currently in the DOM, not just the one that changed -- confirmed by
-    replaying a live postback (a partial/async body 500s; this shape works)."""
-    return {
+    replaying a live postback (a partial/async body 500s; this shape works).
+
+    `page_size` adds the grid's page-size dropdown to the submission. Only
+    pass it once a results grid exists (i.e. after the search postback): the
+    bare search form has no such control to post a value for.
+    """
+    data = {
         "ctl00_ToolkitScriptManager1_HiddenField": hidden["ctl00_ToolkitScriptManager1_HiddenField"],
         "__EVENTTARGET": event_target,
         "__EVENTARGUMENT": event_argument,
@@ -228,6 +241,9 @@ def build_post_data(hidden: dict, search_params: dict, event_target: str,
         f"{PREFIX}$mgrSearchParams$FiledMethod$ctl01": search_params.get("filed_method", "All"),
         "__EVENTVALIDATION": hidden["__EVENTVALIDATION"],
     }
+    if page_size:
+        data[PAGE_SIZE_DROPDOWN] = str(page_size)
+    return data
 
 
 def parse_rows(page: str) -> list[dict]:
@@ -236,6 +252,14 @@ def parse_rows(page: str) -> list[dict]:
     real data rows are exactly 7 <td> cells with an Actions cell that matches
     one of the two known View-link shapes; header cells are <th>, and the
     pager sits in a single colspan="7" <td> with no such match.
+
+    Also skipped, deliberately: rows with a name and year but nothing else --
+    no filing reason, office, filed date, or View link (about 1 in 25 rows on
+    a live 2025 page, checked 2026-09-20). They are not filings: there is no
+    record to link to and no date it was received, so writing one would put
+    a row with no primary record in c1_filings.csv. What the state means by
+    them (a required filer who hasn't filed? an empty placeholder?) is not
+    something this scraper should guess at.
     """
     rows = []
     for row_html in _ROW.findall(page):
@@ -302,26 +326,48 @@ def document_url_for(row: dict) -> str:
     return SEARCH_URL
 
 
+def _stamped(rows: list[dict], retrieved_at: str) -> list[dict]:
+    """Each row carries the date it was actually fetched. A row already
+    stamped keeps its stamp -- re-reading a cache must never make old data
+    look fresh."""
+    return [dict(row, retrieved_at=row.get("retrieved_at") or retrieved_at) for row in rows]
+
+
 class PageCache:
     """Parsed-rows cache keyed by (year, filed_method, page) -- see module
-    docstring for why this sits above Fetcher rather than inside it."""
+    docstring for why this sits above Fetcher rather than inside it.
+
+    Every cached row comes back with a `retrieved_at` of the day the page was
+    really fetched. Before 2026-09-20 the cache was a bare list and
+    rows_to_filings() stamped everything with the *run* date, so a 2018 page
+    fetched months ago would claim today's retrieval date on the hub -- the
+    kind of quietly-wrong provenance an unattended nightly must not produce.
+
+    The key includes the page size: a page-N-of-10-rows file is not a
+    page-N-of-50-rows file, so the pre-2026-09-20 `<year>-<method>-p<n>.json`
+    entries (all at 10) are simply never read again rather than misread.
+    """
 
     def __init__(self, cache_dir: Path = None):
         self.cache_dir = Path(cache_dir or PAGE_CACHE_DIR)
 
     def _path(self, year: int, filed_method: str, page: int) -> Path:
-        return self.cache_dir / f"{year}-{filed_method}-p{page}.json"
+        return self.cache_dir / f"{year}-{filed_method}-s{PAGE_SIZE}-p{page}.json"
 
     def get(self, year: int, filed_method: str, page: int):
         path = self._path(year, filed_method, page)
         if not path.exists():
             return None
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return _stamped(payload["rows"], payload["retrieved_at"])
 
-    def put(self, year: int, filed_method: str, page: int, rows: list[dict]):
+    def put(self, year: int, filed_method: str, page: int, rows: list[dict],
+            retrieved_at: str = None):
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        stamp = retrieved_at or date.today().isoformat()
         self._path(year, filed_method, page).write_text(
-            json.dumps(rows, indent=2), encoding="utf-8"
+            json.dumps({"retrieved_at": stamp, "rows": _stamped(rows, stamp)}, indent=2),
+            encoding="utf-8",
         )
 
 
@@ -330,43 +376,57 @@ def scrape_year(fetcher: Fetcher, year: int, filed_method: str = "All",
                 max_pages: int = None) -> list[dict]:
     """Every C-1/C-2 filing indexed for one Filing Year. Resumable at the page
     level via PageCache; a run interrupted mid-year can be rerun and will only
-    refetch pages it never finished."""
+    refetch pages it never finished.
+
+    Live requests per year: GET the form, POST the search, POST the page-size
+    change (skipped when the search is empty), then one POST per further
+    page of PAGE_SIZE rows.
+    """
     search_params = {"year": year, "filed_method": filed_method}
     cache = cache or PageCache()
     ceiling = max_pages or MAX_PAGES_PER_YEAR
+    today = date.today().isoformat()
+
+    def start_search():
+        """GET the form, run the search, switch the grid to PAGE_SIZE rows.
+        Returns (hidden fields for the next postback, page-1 html)."""
+        hidden = extract_hidden(fetcher.get(SEARCH_URL))
+        page_small = fetcher.post(SEARCH_URL, build_post_data(hidden, search_params, SEARCH_BUTTON))
+        hidden = extract_hidden(page_small)
+        if not parse_rows(page_small):
+            return hidden, page_small  # nothing to page through -- no resize needed
+        page1 = fetcher.post(SEARCH_URL, build_post_data(
+            hidden, search_params, PAGE_SIZE_DROPDOWN, page_size=PAGE_SIZE))
+        return extract_hidden(page1), page1
+
+    # Hidden state is needed to keep paging even when page 1 came from the
+    # cache -- so a fresh GET+search+resize happens lazily, the first time a
+    # later page turns out not to be cached. On a live page-1 fetch the
+    # state is kept, not thrown away and re-fetched (which the previous
+    # version did: two wasted requests per year).
+    hidden = None
+    last_page = 1
 
     cached_first = None if refresh else cache.get(year, filed_method, 1)
     if cached_first is not None:
         rows = list(cached_first)
     else:
-        page0 = fetcher.get(SEARCH_URL)
-        hidden = extract_hidden(page0)
-        data = build_post_data(hidden, search_params, SEARCH_BUTTON)
-        page1 = fetcher.post(SEARCH_URL, data)
-        hidden = extract_hidden(page1)
-        rows = parse_rows(page1)
-        cache.put(year, filed_method, 1, rows)
-        _last_page_html = page1
+        hidden, page1 = start_search()
+        last_page = max_page_number(page1)
+        rows = _stamped(parse_rows(page1), today)
+        cache.put(year, filed_method, 1, rows, retrieved_at=today)
 
     if not rows:
         return []
 
-    # Need hidden state to keep paging even on a cache hit for page 1 -- so a
-    # fresh GET+search is required whenever any later page isn't cached either.
     all_rows = list(rows)
     page_number = 1
-    last_page = 1
-    hidden = None
 
     def ensure_live_state():
         nonlocal hidden, last_page
         if hidden is not None:
             return
-        page0 = fetcher.get(SEARCH_URL)
-        hidden = extract_hidden(page0)
-        data = build_post_data(hidden, search_params, SEARCH_BUTTON)
-        page1 = fetcher.post(SEARCH_URL, data)
-        hidden = extract_hidden(page1)
+        hidden, page1 = start_search()
         last_page = max_page_number(page1)
 
     while page_number < ceiling:
@@ -382,12 +442,13 @@ def scrape_year(fetcher: Fetcher, year: int, filed_method: str = "All",
         if page_number >= last_page:
             break
         page_number += 1
-        data = build_post_data(hidden, search_params, GRID_CONTROL, f"Page${page_number}")
+        data = build_post_data(hidden, search_params, GRID_CONTROL, f"Page${page_number}",
+                               page_size=PAGE_SIZE)
         page_html = fetcher.post(SEARCH_URL, data)
         hidden = extract_hidden(page_html)
         last_page = max(last_page, max_page_number(page_html))
-        new_rows = parse_rows(page_html)
-        cache.put(year, filed_method, page_number, new_rows)
+        new_rows = _stamped(parse_rows(page_html), today)
+        cache.put(year, filed_method, page_number, new_rows, retrieved_at=today)
         if not new_rows:
             break
         all_rows.extend(new_rows)
@@ -453,6 +514,9 @@ FIELDNAMES = ["disclosure_id", "year", "filer_name_raw", "filer_office",
 
 
 def rows_to_filings(rows: list[dict], retrieved_at: str) -> list[dict]:
+    """`retrieved_at` is the fallback for a row that carries no stamp of its
+    own (a freshly parsed page handed in directly); a row from PageCache
+    keeps the date it was really fetched."""
     out = []
     for row in rows:
         out.append({
@@ -464,7 +528,7 @@ def rows_to_filings(rows: list[dict], retrieved_at: str) -> list[dict]:
             "filing_reason": row["filing_reason"],
             "filed_date": row["filed_date"],
             "document_url": document_url_for(row),
-            "retrieved_at": retrieved_at,
+            "retrieved_at": row.get("retrieved_at") or retrieved_at,
         })
     return out
 
@@ -482,7 +546,18 @@ def write_filings_csv(filings: list[dict], path: Path):
     return len(ordered)
 
 
-def main():
+# A filing for year N keeps arriving well into N+1 (the fixture's own sample:
+# year 2023, filed 1/24/2024), so "what can still change" is the two newest
+# filing years. Everything older is frozen once swept -- the same
+# historical-legislature rule ne-lobbying's nightly uses. Amendments to an
+# older year's filings are NOT caught by --new-only; a full --refresh is the
+# (rare, deliberate, hour-scale) way to pick those up.
+def refresh_window(today: date = None) -> int:
+    """The earliest filing year --new-only re-fetches."""
+    return (today or date.today()).year - 1
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Scrape NADC's C-1/C-2 search grid.")
     parser.add_argument("--years", type=int, nargs="+", default=None,
                          help="filing years to scrape (default: 2018..this year)")
@@ -490,19 +565,26 @@ def main():
     parser.add_argument("--max-pages", type=int, default=None,
                          help="stop each year after this many result pages (for sampling)")
     parser.add_argument("--delay", type=float, default=DEFAULT_DELAY)
-    parser.add_argument("--refresh", action="store_true", help="ignore the page cache")
+    parser.add_argument("--refresh", action="store_true",
+                         help="ignore the page cache for every year (a full re-sweep)")
+    parser.add_argument("--new-only", action="store_true",
+                         help="re-fetch only the two newest filing years; older years "
+                              "come from the page cache (the cron's mode -- without "
+                              "either flag every year is a permanent cache hit and the "
+                              "current year never moves)")
     parser.add_argument("--out", type=Path, default=PROCESSED_DIR / "c1_filings.csv")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     years = args.years or FILING_YEARS
     fetcher = Fetcher(delay=args.delay)
     cache = PageCache()
     all_rows = []
     for year in years:
-        print(f"Filing Year {year} ({args.filed_method})...")
+        refresh = args.refresh or (args.new_only and year >= refresh_window())
+        print(f"Filing Year {year} ({args.filed_method}){' -- refreshing' if refresh else ''}...")
         try:
             rows = scrape_year(fetcher, year, args.filed_method, cache,
-                                refresh=args.refresh, max_pages=args.max_pages)
+                                refresh=refresh, max_pages=args.max_pages)
         except RateLimited as exc:
             print(f"  stopping politely -- {exc}", file=sys.stderr)
             break
