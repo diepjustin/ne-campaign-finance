@@ -115,3 +115,24 @@ def test_write_financial_interests_csv_round_trips(tmp_path):
     text = out.read_text(encoding="utf-8")
     assert "disclosure_id" in text.splitlines()[0]
     assert "Acme" in text
+
+
+def test_main_stops_on_rate_limit_and_still_writes_what_it_has(tmp_path, monkeypatch):
+    filings = [{"disclosure_id": str(i), "filed_method": "electronic", "year": "2024"} for i in range(5)]
+    monkeypatch.setattr(bfi, "read_filings", lambda path: filings)
+    seen = []
+
+    def fake_process(fetcher, filing):
+        seen.append(filing["disclosure_id"])
+        if filing["disclosure_id"] == "1":
+            raise bfi.RateLimited("429 after retries")
+        return [{"ocr": False}]
+
+    written = {}
+    monkeypatch.setattr(bfi, "process_filing", fake_process)
+    monkeypatch.setattr(bfi, "write_financial_interests_csv",
+                        lambda rows, path: written.setdefault("rows", rows) and len(rows))
+    monkeypatch.setattr("sys.argv", ["bfi", "--out", str(tmp_path / "out.csv")])
+    bfi.main()
+    assert seen == ["0", "1"]  # did not keep hammering filings 2-4
+    assert written["rows"] == [{"ocr": False}]

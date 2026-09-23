@@ -139,7 +139,7 @@ def download_year(
         print(f"    warning: {warning}")
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(csv_text)
+    out_path.write_text(csv_text, encoding="utf-8")
     sha256 = hashlib.sha256(csv_text.encode("utf-8")).hexdigest()
 
     meta.setdefault(dataset, {}).setdefault(str(year), []).append(

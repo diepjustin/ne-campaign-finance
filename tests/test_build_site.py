@@ -245,3 +245,12 @@ def test_legacy_rows_join_the_same_detail_list_tagged_pre2022(tmp_path, monkeypa
     # The legacy row must never inflate the modern-only aggregate total.
     by_name = {c[0]: c for c in contributors}
     assert by_name["JANE DOE"][1] == 50.0
+
+
+def test_script_json_cannot_close_the_script_element():
+    import json
+
+    payload = [{"name": "X</script><b>pwned</b>"}]
+    out = build_site.script_json(payload)
+    assert "</" not in out
+    assert json.loads(out) == payload

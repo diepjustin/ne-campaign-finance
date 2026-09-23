@@ -188,7 +188,7 @@ jobs:
             # run's stale data -- confirmed happening for real in ne-fec's
             # identical pattern on 2026-09-19 -- delete any existing
             # same-day release first so a re-run actually replaces it.
-            gh release delete "$tag" --repo diepjustin/ne-campaign-finance --yes 2>/dev/null || true
+            gh release delete "$tag" --repo diepjustin/ne-campaign-finance --yes --cleanup-tag 2>/dev/null || true
             gh release create "$tag" release/*.gz \
               --repo diepjustin/ne-campaign-finance \
               --title "Campaign finance hub data — $(TZ=America/Chicago date +%Y-%m-%d)" \
@@ -205,4 +205,4 @@ jobs:
         run: |
           gh release list --repo diepjustin/ne-campaign-finance --json tagName,createdAt --limit 100 \
             | jq -r '[.[] | select(.tagName | startswith("ne-campaign-finance-data-"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName' \
-            | xargs -r -n1 -I{} gh release delete {} --repo diepjustin/ne-campaign-finance --yes
+            | xargs -r -n1 -I{} gh release delete {} --repo diepjustin/ne-campaign-finance --yes --cleanup-tag
