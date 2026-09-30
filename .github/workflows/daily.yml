@@ -198,11 +198,21 @@ jobs:
             echo "::warning::nothing to release -- skipping"
           fi
 
+      # Sorted by tag name, never createdAt. A release's createdAt is the date
+      # of the commit its tag points at, not when it was published, so every
+      # release cut from an unchanged main ties -- and the list returns ties
+      # newest-first, which `reverse` turned into newest-last, so `.[3:]`
+      # deleted the release this run had just made. 09-24 through 09-29 2026
+      # were each published and deleted within the same run (their tags
+      # still point at 90c5151, whose commit date every surviving release
+      # shares), and ne-connect kept building from the 09-23 release. The tag
+      # carries its own Central date (YYYY-MM-DD), so it sorts correctly as
+      # text -- the same key ne-connect already uses to pick the newest.
       - name: Delete old hub-data releases (keep newest 3)
         if: always() && steps.cachecheck.outputs.ok == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release list --repo diepjustin/ne-campaign-finance --json tagName,createdAt --limit 100 \
-            | jq -r '[.[] | select(.tagName | startswith("ne-campaign-finance-data-"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName' \
+          gh release list --repo diepjustin/ne-campaign-finance --json tagName --limit 100 \
+            | jq -r '[.[] | select(.tagName | startswith("ne-campaign-finance-data-"))] | sort_by(.tagName) | reverse | .[3:] | .[].tagName' \
             | xargs -r -n1 -I{} gh release delete {} --repo diepjustin/ne-campaign-finance --yes --cleanup-tag
