@@ -135,6 +135,13 @@ STYLE = """
 """
 
 
+def script_json(obj) -> str:
+    """JSON for inlining inside <script>. json.dumps leaves "/" alone, so a
+    filer-entered name containing "</script>" would close the element and
+    render the rest as HTML; "<\\/" parses to the same string."""
+    return json.dumps(obj, separators=(",", ":")).replace("</", "<\\/")
+
+
 def _money(raw: str) -> float:
     try:
         return float(raw)
@@ -373,8 +380,8 @@ def main() -> int:
     disclosure_items_payload = json.dumps(disclosure_items_index, separators=(",", ":"))
     DISCLOSURE_ITEMS_OUT.write_text(disclosure_items_payload, encoding="utf-8")
 
-    contributors_json = json.dumps(contributors, separators=(",", ":"))
-    filers_json = json.dumps(filers, separators=(",", ":"))
+    contributors_json = script_json(contributors)
+    filers_json = script_json(filers)
 
     rows_table = "".join(
         f"<tr><td>{label}</td><td class='n'>{counts[key]:,}</td><td>{note}</td></tr>"

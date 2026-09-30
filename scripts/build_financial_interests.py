@@ -46,7 +46,7 @@ from pypdf import PdfReader
 from pdfminer.high_level import extract_text as pdfminer_text
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from scrape_c1 import Fetcher, resolve_electronic_pdf  # noqa: E402
+from scrape_c1 import Fetcher, RateLimited, resolve_electronic_pdf  # noqa: E402
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PROCESSED_DIR = DATA_DIR / "processed"
@@ -326,6 +326,11 @@ def main():
         print(f"[{i}/{len(filings)}] {filing['disclosure_id']} ({filing['filed_method']})")
         try:
             rows = process_filing(fetcher, filing)
+        except RateLimited as exc:  # includes Unreachable
+            # Every remaining filing would burn the full retry budget against
+            # a server that just asked us to back off -- stop, keep what we have.
+            print(f"  stopping politely -- {exc}", file=sys.stderr)
+            break
         except Exception as exc:
             print(f"  error: {exc}", file=sys.stderr)
             continue

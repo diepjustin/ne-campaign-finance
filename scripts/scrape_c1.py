@@ -194,7 +194,12 @@ class Fetcher:
                 self.requests_made += 1
                 return response.text
 
-            wait = float(response.headers.get("Retry-After") or self.delay * (2 ** (attempt + 1)))
+            # Retry-After may be an HTTP-date rather than seconds (RFC 7231);
+            # fall back to our own backoff instead of crashing on float().
+            try:
+                wait = float(response.headers.get("Retry-After") or "")
+            except ValueError:
+                wait = self.delay * (2 ** (attempt + 1))
             self.rate_limit_waits += 1
             print(f"    429 -- waiting {wait:.0f}s (attempt {attempt + 1})", file=sys.stderr)
             time.sleep(wait)

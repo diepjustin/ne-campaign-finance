@@ -241,3 +241,39 @@ def test_without_new_only_or_refresh_every_year_is_a_cache_hit(tmp_path, monkeyp
     monkeypatch.setattr(sc, "PageCache", lambda: real_cache(cache_dir=tmp_path))
     sc.main(["--years", "2024", "2025", "--out", str(tmp_path / "out.csv")])
     assert seen == [False, False]
+
+
+class _Resp:
+    def __init__(self, status, headers=None, text=""):
+        self.status_code, self.headers, self.text = status, headers or {}, text
+
+    def raise_for_status(self):
+        pass
+
+
+class _Session:
+    def __init__(self, responses):
+        self.headers, self._responses = {}, list(responses)
+
+    def get(self, url, timeout):
+        return self._responses.pop(0)
+
+
+def test_retry_after_http_date_falls_back_to_backoff_instead_of_crashing(monkeypatch):
+    waits = []
+    monkeypatch.setattr(sc.time, "sleep", waits.append)
+    session = _Session([
+        _Resp(429, {"Retry-After": "Wed, 21 Oct 2026 07:28:00 GMT"}),
+        _Resp(200, text="ok"),
+    ])
+    fetcher = sc.Fetcher(delay=1.0, session=session)
+    assert fetcher.get("https://example.test/") == "ok"
+    assert waits == [2.0]  # delay * 2 ** (attempt + 1), attempt 0
+
+
+def test_retry_after_seconds_is_still_honored(monkeypatch):
+    waits = []
+    monkeypatch.setattr(sc.time, "sleep", waits.append)
+    session = _Session([_Resp(429, {"Retry-After": "7"}), _Resp(200, text="ok")])
+    assert sc.Fetcher(delay=1.0, session=session).get("https://example.test/") == "ok"
+    assert waits == [7.0]
